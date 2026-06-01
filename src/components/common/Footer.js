@@ -22,11 +22,11 @@ export default function Footer() {
                   className="object-cover"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="font-heading font-extrabold text-base tracking-wider text-white">
-                  JD MUSIC
+              <div className="flex flex-col justify-center">
+                <span className="font-heading font-extrabold text-sm sm:text-base tracking-wide bg-gradient-to-r from-white via-slate-100 to-gold bg-clip-text text-transparent group-hover:opacity-90 transition-opacity leading-none pb-1">
+                  JD Music
                 </span>
-                <span className="text-[8px] uppercase tracking-[0.25em] text-silver-dark font-medium -mt-1">
+                <span className="text-[10px] sm:text-[11px] tracking-widest text-silver-dark font-medium leading-none">
                   Entertainment
                 </span>
               </div>
