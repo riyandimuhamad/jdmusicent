@@ -1,0 +1,86 @@
+[
+  {
+    "id": "simple-electone",
+    "name": "SIMPLE ELECTONE",
+    "price": 2000000,
+    "originalPrice": 2000000,
+    "tagline": "Pilihan simpel untuk suasana romantis.",
+    "isPopular": false,
+    "duration": "Standar",
+    "members": "Singer Male, Singer Female, Keyboard",
+    "soundSystem": "Sound System Standard",
+    "features": [
+      "Wedding Entrance",
+      "Sound System"
+    ],
+    "specifications": {
+      "personnel": ["Singer Male", "Singer Female", "Keyboard"],
+      "equipment": ["Keyboard", "Sound System"],
+      "area": "Bandung & Sekitarnya",
+      "technicalRiders": "Kelistrikan standard panggung."
+    }
+  },
+  {
+    "id": "acoustic-elegant",
+    "name": "ACOUSTIC ELEGANT",
+    "price": 2600000,
+    "originalPrice": 2600000,
+    "tagline": "Sempurna untuk acara intimate dan hangat.",
+    "isPopular": true,
+    "duration": "Standar",
+    "members": "Singer Male, Singer Female, Keyboard, Saxophone",
+    "soundSystem": "Sound System Standard",
+    "features": [
+      "Wedding Entrance",
+      "Sound System"
+    ],
+    "specifications": {
+      "personnel": ["Singer Male", "Singer Female", "Keyboard", "Saxophone"],
+      "equipment": ["Keyboard", "Saxophone", "Sound System"],
+      "area": "Bandung & Sekitarnya",
+      "technicalRiders": "Kelistrikan standard panggung."
+    }
+  },
+  {
+    "id": "full-band-harmony",
+    "name": "FULL BAND HARMONY",
+    "price": 3700000,
+    "originalPrice": 3700000,
+    "tagline": "Penampilan harmonis untuk pesta meriah.",
+    "isPopular": false,
+    "duration": "Standar",
+    "members": "Singer Male, Singer Female, Keyboard, Saxophone, Drum Electric, Bassist",
+    "soundSystem": "Sound System Premium",
+    "features": [
+      "Wedding Entrance",
+      "Sound System"
+    ],
+    "specifications": {
+      "personnel": ["Singer Male", "Singer Female", "Keyboard", "Saxophone", "Drum Electric", "Bassist"],
+      "equipment": ["Keyboard", "Saxophone", "Drum Electric", "Bass", "Sound System"],
+      "area": "Bandung & Sekitarnya",
+      "technicalRiders": "Kelistrikan premium panggung."
+    }
+  },
+  {
+    "id": "grand-band-prestige",
+    "name": "GRAND BAND PRESTIGE",
+    "price": 4000000,
+    "originalPrice": 4000000,
+    "tagline": "Formasi terlengkap untuk kemegahan sejati.",
+    "isPopular": false,
+    "duration": "Standar",
+    "members": "Singer Male, Singer Female, Keyboard, Saxophone, Drum Electric, Bassist, Guitar",
+    "soundSystem": "Sound System Premium",
+    "features": [
+      "Wedding Entrance",
+      "Sound System"
+    ],
+    "specifications": {
+      "personnel": ["Singer Male", "Singer Female", "Keyboard", "Saxophone", "Drum Electric", "Bassist", "Guitar"],
+      "equipment": ["Keyboard", "Saxophone", "Drum Electric", "Bass", "Guitar", "Sound System"],
+      "area": "Bandung & Sekitarnya",
+      "technicalRiders": "Kelistrikan premium panggung."
+    }
+  }
+]

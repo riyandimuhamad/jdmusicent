@@ -1,0 +1,52 @@
+[
+  {
+    "id": "modern-minimalist",
+    "name": "Modern Minimalist",
+    "description": "Desain bersih, modern, dan elegan dengan tipografi kontemporer dan layout lapang. Sangat cocok untuk pasangan berjiwa muda.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#FFFFFF", "#F3F4F6", "#1F2937", "#9CA3AF"],
+    "vibe": "Clean, Modern, Sophisticated",
+    "previewUrl": "/assets/templates/minimalist-preview.jpg"
+  },
+  {
+    "id": "rustic-blossom",
+    "name": "Rustic Warmth",
+    "description": "Nuansa alam yang hangat, dihiasi ilustrasi bunga kering, dedaunan pastel, dan latar kayu vintage yang romantis.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#FAF5EF", "#D4A373", "#E9D8A6", "#606C38"],
+    "vibe": "Warm, Floral, Earthy, Organic",
+    "previewUrl": "/assets/templates/rustic-preview.jpg"
+  },
+  {
+    "id": "royal-navy-gold",
+    "name": "Royal Navy & Gold",
+    "description": "Kombinasi warna biru dongker pekat dan foil emas berkilau. Sangat serasi dengan identitas mewah dan profesional JD Music.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#0A1128", "#1C2541", "#D4AF37", "#E2E8F0"],
+    "vibe": "Luxury, Elegant, Royal, Premium",
+    "previewUrl": "/assets/templates/navy-gold-preview.jpg"
+  },
+  {
+    "id": "emerald-botanical",
+    "name": "Emerald Botanical",
+    "description": "Kemewahan dedaunan tropis hijau botol dipadu dengan garis-garis emas geometris. Menampilkan kesan eksotis sekaligus berkelas.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#064E3B", "#10B981", "#D4AF37", "#F9FAFB"],
+    "vibe": "Fresh, Exotic, Premium, Botanical",
+    "previewUrl": "/assets/templates/emerald-preview.jpg"
+  },
+  {
+    "id": "vintage-classic",
+    "name": "Vintage Classic",
+    "description": "Sentuhan retro romantis dengan bingkai klasik ornamen Eropa kuno, font serif anggun, dan sentuhan warna rose-gold lembut.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#FFF0F5", "#B38B6D", "#B8860B", "#8B0000"],
+    "vibe": "Classic, Romantic, Retro, European Ornament",
+    "previewUrl": "/assets/templates/vintage-preview.jpg"
+  }
+]
