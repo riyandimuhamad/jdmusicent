@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Music, Mail, Phone, MapPin, Clock } from "lucide-react";
 
 export default function Footer() {
@@ -13,8 +14,13 @@ export default function Footer() {
           {/* Column 1: Brand Profile */}
           <div className="space-y-4 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2 group">
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-gold to-yellow-600 shadow-md">
-                <Music className="w-4 h-4 text-navy-dark font-bold" />
+              <div className="relative flex items-center justify-center w-8 h-8 rounded-md shadow-md shadow-gold/20 group-hover:scale-105 transition-all duration-300 overflow-hidden bg-gold">
+                <Image 
+                  src="/logo-3d.png" 
+                  alt="JD Music Logo" 
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="font-heading font-extrabold text-base tracking-wider text-white">
@@ -128,8 +134,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center space-x-3 text-sm text-slate-400">
                 <Phone className="w-4 h-4 text-gold flex-shrink-0" />
-                <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
-                  +62 812-3456-7890
+                <a href={`https://wa.me/${process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"}`} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
+                  +62 851-4774-6761
                 </a>
               </li>
               <li className="flex items-center space-x-3 text-sm text-slate-400">

@@ -29,6 +29,7 @@ function BookingFormContent() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [waUrl, setWaUrl] = useState("");
 
   // Derived Values
   const selectedPackage = packagesData.find((p) => p.id === selectedPackageId) || null;
@@ -102,38 +103,40 @@ function BookingFormContent() {
     const formattedDate = `${day}/${month}/${year}`;
 
     // WhatsApp Message Builder
-    const whatsappNumber = "6281234567890"; // Hardcoded Admin WA (NFR 5.4, FR 7.1)
+    const whatsappNumber = process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"; 
     
-    const message = `Halo Admin JD Music! Ada pesanan masuk:
+    const message = `Halo Admin JD Music! Saya ingin menanyakan ketersediaan jadwal untuk acara pernikahan saya:
 
-📅 DETAIL PESANAN
-Nama       : ${formData.name}
-WhatsApp   : ${formData.whatsapp}
-Tanggal    : ${formattedDate}
-Venue      : ${formData.venue}
+*DETAIL ACARA*
+Nama Pemesan : ${formData.name}
+No. WhatsApp : ${formData.whatsapp}
+Tgl. Acara   : ${formattedDate}
+Lokasi/Venue : ${formData.venue}
 
-🎵 PAKET DIPILIH
-Paket      : ${selectedPackage?.name}
-Add-on     : ${isPremiumPackage ? "Undangan Digital (FREE BUNDLE)" : (isAddonChecked ? "Undangan Digital" : "-")}
-Tema Undgn : ${isPremiumPackage || isAddonChecked ? selectedTheme.name : "-"}
-Total Harga: ${formatIDR(totalPrice)}
+*PAKET YANG DIPILIH*
+Paket Musik  : ${selectedPackage?.name}
+Add-on Undgn : ${isPremiumPackage ? "Undangan Digital (GRATIS/BUNDLE)" : (isAddonChecked ? "Undangan Digital" : "Tidak Ada")}
+Tema Undangan: ${isPremiumPackage || isAddonChecked ? selectedTheme.name : "-"}
+Total Harga  : ${formatIDR(totalPrice)}
 
-📝 Catatan    : ${formData.notes.trim() || "-"}
+*Catatan Khusus*: 
+${formData.notes.trim() || "-"}
 
-Mohon konfirmasi ketersediaan jadwal. Terima kasih!`;
+Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
-    // Open WhatsApp
-    window.open(whatsappUrl, "_blank");
+    // Simpan URL dan buka modal (menghindari popup blocker)
+    setWaUrl(whatsappUrl);
 
     setIsSubmitting(false);
     setShowSuccessModal(true);
   };
 
   return (
-    <div className="min-h-screen pt-28 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
+    <>
+      <div className="min-h-screen pt-28 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
       
       {/* Background Radial Glow */}
       <div className="absolute top-[15%] left-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
@@ -465,9 +468,11 @@ Mohon konfirmasi ketersediaan jadwal. Terima kasih!`;
 
       </div>
 
+      </div>
+
       {/* Success Modal Confirmation */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           {/* Blur Backdrop */}
           <div onClick={() => setShowSuccessModal(false)} className="absolute inset-0 bg-navy-dark/90 backdrop-blur-md" />
           
@@ -478,32 +483,47 @@ Mohon konfirmasi ketersediaan jadwal. Terima kasih!`;
             </div>
             
             <div className="space-y-2">
-              <h3 className="font-heading font-extrabold text-xl text-white">Booking Berhasil Dikirim!</h3>
+              <h3 className="font-heading font-extrabold text-xl text-white">Satu Langkah Lagi!</h3>
               <p className="text-sm text-slate-300 leading-relaxed">
-                Detail pesanan Anda telah berhasil digenerate dan dikirimkan ke aplikasi WhatsApp Admin kami. 
+                Formulir Anda telah direkap. Sistem kami sedang membuka aplikasi WhatsApp Anda.
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-xs text-slate-400 space-y-2">
-              <p><strong>Langkah Selanjutnya:</strong></p>
-              <p>Admin JD Music akan memeriksa ketersediaan tanggal panggung pada <strong>{formData.date ? formData.date.split("-").reverse().join("/") : ""}</strong>.</p>
-              <p>Konfirmasi tertulis beserta nominal DP untuk mengunci jadwal akan dibalas langsung di WhatsApp Anda.</p>
+            <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 text-xs text-slate-300 space-y-3 text-left">
+              <p className="text-gold font-bold text-center">⚠️ PERHATIAN</p>
+              <p>Sistem <strong>belum</strong> mengirimkan pesanan secara otomatis. Silakan klik tombol hijau di bawah ini untuk membuka WhatsApp.</p>
+              <p>Mohon tekan tombol <strong>KIRIM (Send)</strong> di aplikasi WhatsApp Anda agar pesan tersebut masuk ke Admin JD Music.</p>
             </div>
 
-            <button
-              onClick={() => {
-                setShowSuccessModal(false);
-                router.push("/");
-              }}
-              className="w-full py-3.5 rounded-xl font-bold text-navy-dark bg-gradient-to-r from-gold to-yellow-500 hover:from-yellow-600 hover:to-gold transition-colors"
-            >
-              Kembali ke Beranda
-            </button>
+            <div className="pt-2 flex flex-col gap-3">
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setTimeout(() => {
+                    setShowSuccessModal(false);
+                    // Reset form optional if needed, but staying on page is fine
+                  }, 1000);
+                }}
+                className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25"
+              >
+                <span>Buka WhatsApp Sekarang</span>
+              </a>
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  router.push("/");
+                }}
+                className="w-full py-3.5 rounded-xl font-bold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+              >
+                Batal (Kembali ke Beranda)
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }
 

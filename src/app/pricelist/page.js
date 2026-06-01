@@ -84,7 +84,7 @@ export default function PricelistPage() {
               Punya kebutuhan instrumen tambahan (Orkestra, Trumpet, Harpa)? Hubungi admin langsung.
             </p>
             <a
-              href="https://wa.me/6281234567890"
+              href={`https://wa.me/${process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
