@@ -1,6 +1,184 @@
 [
   {
-    "id": "modern-minimalist",
+    "id": "lokal-sunda-priangan",
+    "category": "Lokal",
+    "name": "Sunda Priangan",
+    "description": "Menggambarkan kesejukan pegunungan Parahyangan. Memadukan warna hijau sage, putih bersih, dan emas muda dengan ornamen melati yang anggun.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#8FBC8F", "#F8FAFC", "#E5D0A1", "#2F4F4F"],
+    "vibe": "Fresh, Mountain, Elegant, Melati",
+    "previewUrl": "/assets/templates/sunda-priangan-preview.jpg"
+  },
+  {
+    "id": "lokal-sunda-cirebonan",
+    "category": "Lokal",
+    "name": "Sunda Cirebonan",
+    "description": "Estetika keraton pesisir utara yang mewah. Menonjolkan corak batik Megamendung berwarna biru pekat dengan aksen merah hati dan emas.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#102A43", "#8B0000", "#D4AF37", "#F0F4F8"],
+    "vibe": "Coastal, Megamendung, Royal, Bold",
+    "previewUrl": "/assets/templates/sunda-cirebonan-preview.jpg"
+  },
+  {
+    "id": "lokal-sunda-banten",
+    "category": "Lokal",
+    "name": "Sunda Banten (Cilegon)",
+    "description": "Menggambarkan ketegasan dan kesakralan budaya Banten. Perpaduan kontras antara putih tulang, hitam legam, dan kuning kuningan keraton.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#FDF5E6", "#111111", "#FFD700", "#808080"],
+    "vibe": "Sacred, Strong, Cultural, Contrast",
+    "previewUrl": "/assets/templates/sunda-banten-preview.jpg"
+  },
+  {
+    "id": "lokal-sunda-pasundan",
+    "category": "Lokal",
+    "name": "Sunda Pasundan Classic",
+    "description": "Membawa kehangatan bumi Pasundan klasik melalui elemen kayu tradisional, hijau daun, dan putih mutiara. Sangat natural dan membumi.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#5D4037", "#4CAF50", "#FFFAF0", "#3E2723"],
+    "vibe": "Earthy, Heritage, Calm, Natural",
+    "previewUrl": "/assets/templates/sunda-pasundan-preview.jpg"
+  },
+  {
+    "id": "lokal-javanese-heritage",
+    "category": "Lokal",
+    "name": "Javanese Heritage",
+    "description": "Menggabungkan ornamen dan corak batik yang elegan dengan sentuhan warna cokelat soga tua dan tinta emas. Tema tradisional yang sangat premium.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#3E2723", "#5D4037", "#D4AF37", "#FFF8E1"],
+    "vibe": "Traditional, Elegant, Cultural, Golden",
+    "previewUrl": "/assets/templates/javanese-preview.jpg"
+  },
+  {
+    "id": "lokal-jawa-keraton",
+    "category": "Lokal",
+    "name": "Jawa Keraton Solo",
+    "description": "Keanggunan tata krama Keraton Surakarta. Menampilkan motif batik Sidomukti, palet warna hijau keraton, dan ukiran klasik Jawa yang sakral.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#1A3622", "#D4AF37", "#F5DEB3", "#3E2723"],
+    "vibe": "Royal, Solo, Sidomukti, Sacred",
+    "previewUrl": "/assets/templates/jawa-keraton-preview.jpg"
+  },
+  {
+    "id": "lokal-balinese-agung",
+    "category": "Lokal",
+    "name": "Balinese Agung",
+    "description": "Keagungan budaya Pulau Dewata dengan perpaduan warna kuning kuningan dan ukiran prada putih. Megah, magis, namun tidak berlebihan.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#FFD700", "#FFFDE7", "#B8860B", "#F5F5DC"],
+    "vibe": "Majestic, Golden, Tropical, Bali",
+    "previewUrl": "/assets/templates/balinese-preview.jpg"
+  },
+  {
+    "id": "lokal-minang-gadang",
+    "category": "Lokal",
+    "name": "Minang Gadang",
+    "description": "Identitas Ranah Minang yang sangat kental melalui palet merah marun gelap berpadu dengan filigri emas klasik khas rumah gadang.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#800000", "#4A0404", "#D4AF37", "#FFDAB9"],
+    "vibe": "Bold, Maroon, Gold, Heritage",
+    "previewUrl": "/assets/templates/minang-preview.jpg"
+  },
+  {
+    "id": "lokal-batak-ulos",
+    "category": "Lokal",
+    "name": "Batak Ulos",
+    "description": "Kesan maskulin dan elegan khas pesona Sumatera Utara. Kombinasi hitam legam dan pola tenun ulos merah terakota yang estetik.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#1A1A1A", "#8B0000", "#E2725B", "#F5F5F5"],
+    "vibe": "Bold, Aesthetic, Woven, Heritage",
+    "previewUrl": "/assets/templates/batak-preview.jpg"
+  },
+  {
+    "id": "lokal-bugis-mappacci",
+    "category": "Lokal",
+    "name": "Bugis Mappacci",
+    "description": "Pesona malam mappacci khas Sulawesi Selatan dengan warna dominan hijau zamrud pekat dan aksen benang emas kebangsawanan.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#004B23", "#008000", "#FFD700", "#F0FFF0"],
+    "vibe": "Emerald, Noble, Gold, Royal",
+    "previewUrl": "/assets/templates/bugis-preview.jpg"
+  },
+  {
+    "id": "lokal-dayak-borneo",
+    "category": "Lokal",
+    "name": "Dayak Borneo",
+    "description": "Sangat nyentrik dan artistik. Menyematkan corak geometris simetris khas suku Dayak dengan dominasi warna hitam dan kuning tegas.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#111111", "#FFCC00", "#FFFFFF", "#333333"],
+    "vibe": "Tribal, Modern, Bold, Geometric",
+    "previewUrl": "/assets/templates/dayak-preview.jpg"
+  },
+  {
+    "id": "lokal-palembang-sriwijaya",
+    "category": "Lokal",
+    "name": "Palembang Sriwijaya",
+    "description": "Pancaran kejayaan Sriwijaya dengan merah gelap dan untaian corak kain songket emas yang sangat premium dan mahal.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#8B0000", "#D4AF37", "#B8860B", "#FFF5EE"],
+    "vibe": "Royal, Luxurious, Songket, Heritage",
+    "previewUrl": "/assets/templates/palembang-preview.jpg"
+  },
+  {
+    "id": "lokal-betawi-pesisir",
+    "category": "Lokal",
+    "name": "Betawi Pesisir",
+    "description": "Cerah, ceria, dan sangat kekinian. Menggunakan paduan warna cerah pastel, hijau muda, merah muda, dan elemen floral khas Jakarta.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#98FB98", "#FFB6C1", "#FFFFE0", "#FF69B4"],
+    "vibe": "Cheerful, Pastel, Floral, Urban Culture",
+    "previewUrl": "/assets/templates/betawi-preview.jpg"
+  },
+  {
+    "id": "lokal-maluku-mutiara",
+    "category": "Lokal",
+    "name": "Maluku Mutiara",
+    "description": "Nuansa laut Indonesia timur yang indah, memadukan warna biru laut dalam, putih mutiara, dan corak karang yang halus.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#000080", "#E0FFFF", "#F5FFFA", "#4682B4"],
+    "vibe": "Oceanic, Pearl, Deep Blue, Eastern",
+    "previewUrl": "/assets/templates/maluku-preview.jpg"
+  },
+  {
+    "id": "lokal-ntt-tenun",
+    "category": "Lokal",
+    "name": "NTT Tenun Senja",
+    "description": "Membawa kehangatan kepulauan Sunda Kecil melalui palet cokelat tanah liat, jingga senja, dan ilustrasi tenun ikat modern.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#8B4513", "#D2691E", "#FF8C00", "#FFF8DC"],
+    "vibe": "Warm, Earthy, Woven, Sunset",
+    "previewUrl": "/assets/templates/ntt-preview.jpg"
+  },
+  {
+    "id": "lokal-papua-asmat",
+    "category": "Lokal",
+    "name": "Papua Asmat Minimalist",
+    "description": "Desain kontemporer yang diadaptasi dari ukiran khas Asmat, disajikan di atas latar belakang hitam matte dengan lekukan warna terakota.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#2C2C2C", "#1E1E1E", "#E2725B", "#F5DEB3"],
+    "vibe": "Contemporary, Matte, Sculptural, Tribal",
+    "previewUrl": "/assets/templates/papua-preview.jpg"
+  },
+  
+  {
+    "id": "nasional-modern-minimalist",
+    "category": "Nasional",
     "name": "Modern Minimalist",
     "description": "Desain bersih, modern, dan elegan dengan tipografi kontemporer dan layout lapang. Sangat cocok untuk pasangan berjiwa muda.",
     "priceAddon": 150000,
@@ -10,7 +188,8 @@
     "previewUrl": "/assets/templates/minimalist-preview.jpg"
   },
   {
-    "id": "rustic-blossom",
+    "id": "nasional-rustic-warmth",
+    "category": "Nasional",
     "name": "Rustic Warmth",
     "description": "Nuansa alam yang hangat, dihiasi ilustrasi bunga kering, dedaunan pastel, dan latar kayu vintage yang romantis.",
     "priceAddon": 150000,
@@ -20,7 +199,30 @@
     "previewUrl": "/assets/templates/rustic-preview.jpg"
   },
   {
-    "id": "royal-navy-gold",
+    "id": "nasional-monochrome-elegance",
+    "category": "Nasional",
+    "name": "Monochrome Elegance",
+    "description": "Tema hitam dan putih klasik dengan komposisi tipografi artistik yang tajam. Memberikan nuansa red-carpet yang eksklusif, minimalis, namun sangat berkelas.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#000000", "#111111", "#F8F8F8", "#A3A3A3"],
+    "vibe": "Classic, Bold, Monochromatic, High-Fashion",
+    "previewUrl": "/assets/templates/monochrome-preview.jpg"
+  },
+  {
+    "id": "nasional-blush-peony",
+    "category": "Nasional",
+    "name": "Blush Peony",
+    "description": "Didominasi oleh kelembutan warna pink pastel dan ilustrasi cat air bunga peony yang mekar. Desain yang sangat manis, murni, dan penuh kelembutan.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#FFF5F7", "#FED7E2", "#F687B3", "#702459"],
+    "vibe": "Feminine, Soft, Watercolor, Romantic",
+    "previewUrl": "/assets/templates/blush-preview.jpg"
+  },
+  {
+    "id": "nasional-royal-navy-gold",
+    "category": "Nasional",
     "name": "Royal Navy & Gold",
     "description": "Kombinasi warna biru dongker pekat dan foil emas berkilau. Sangat serasi dengan identitas mewah dan profesional JD Music.",
     "priceAddon": 200000,
@@ -30,7 +232,8 @@
     "previewUrl": "/assets/templates/navy-gold-preview.jpg"
   },
   {
-    "id": "emerald-botanical",
+    "id": "nasional-emerald-botanical",
+    "category": "Nasional",
     "name": "Emerald Botanical",
     "description": "Kemewahan dedaunan tropis hijau botol dipadu dengan garis-garis emas geometris. Menampilkan kesan eksotis sekaligus berkelas.",
     "priceAddon": 200000,
@@ -40,13 +243,202 @@
     "previewUrl": "/assets/templates/emerald-preview.jpg"
   },
   {
-    "id": "vintage-classic",
-    "name": "Vintage Classic",
+    "id": "nasional-terracotta-sunset",
+    "category": "Nasional",
+    "name": "Terracotta Sunset",
+    "description": "Nuansa senja dengan gradasi warna terakota, jingga redup, dan krem alami. Sangat sempurna untuk pernikahan dengan konsep outdoor atau bohemian.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#FFF5EE", "#E2725B", "#CC4E5C", "#8B4513"],
+    "vibe": "Bohemian, Sunset, Earthy, Outdoor",
+    "previewUrl": "/assets/templates/terracotta-preview.jpg"
+  },
+  {
+    "id": "nasional-sapphire-starlight",
+    "category": "Nasional",
+    "name": "Sapphire Starlight",
+    "description": "Desain malam berbintang dengan latar belakang biru safir pekat dan cipratan debu bintang perak. Mengesankan resepsi malam hari yang magis dan tak terlupakan.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#0F172A", "#1E293B", "#38BDF8", "#E2E8F0"],
+    "vibe": "Magical, Night, Silver, Starry",
+    "previewUrl": "/assets/templates/sapphire-preview.jpg"
+  },
+  {
+    "id": "nasional-ivory-pearl",
+    "category": "Nasional",
+    "name": "Ivory & Pearl",
+    "description": "Nuansa suci nan sakral dengan palet serba putih tulang (ivory) dan kilau mutiara yang halus. Elegan tanpa perlu banyak warna.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#FFFFF0", "#FFF8DC", "#FDF5E6", "#D3D3D3"],
+    "vibe": "Pure, Sacred, Pearl, Elegant",
+    "previewUrl": "/assets/templates/ivory-preview.jpg"
+  },
+  {
+    "id": "nasional-rose-gold",
+    "category": "Nasional",
+    "name": "Rose Gold Glamour",
+    "description": "Memancarkan kilau mewah dan modern melalui kombinasi warna rose-gold metalik dan putih marble murni.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#B76E79", "#F3E5AB", "#FFFFFF", "#E0BFB8"],
+    "vibe": "Glamour, Metallic, Rose Gold, Modern",
+    "previewUrl": "/assets/templates/rosegold-preview.jpg"
+  },
+  {
+    "id": "nasional-classic-marble",
+    "category": "Nasional",
+    "name": "Classic Marble",
+    "description": "Tekstur marmer premium (Calacatta) yang berpadu dengan tipografi sans-serif minimalis, cocok untuk pernikahan di ballroom hotel berbintang.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#F0F4F8", "#D9E2EC", "#BCCCDC", "#102A43"],
+    "vibe": "Marble, Ballroom, Luxurious, Hotel",
+    "previewUrl": "/assets/templates/marble-preview.jpg"
+  },
+  {
+    "id": "nasional-champagne",
+    "category": "Nasional",
+    "name": "Champagne Sparkle",
+    "description": "Perpaduan warna emas muda (champagne) dan kilau glitter ringan yang menyiratkan perayaan penuh kegembiraan dan prestise.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#F7E7CE", "#E5D0A1", "#FFFFFF", "#C2B280"],
+    "vibe": "Champagne, Sparkle, Prestige, Joy",
+    "previewUrl": "/assets/templates/champagne-preview.jpg"
+  },
+
+  {
+    "id": "int-victorian-classic",
+    "category": "Internasional",
+    "name": "Victorian Classic",
     "description": "Sentuhan retro romantis dengan bingkai klasik ornamen Eropa kuno, font serif anggun, dan sentuhan warna rose-gold lembut.",
     "priceAddon": 250000,
     "priceStandalone": 400000,
     "colors": ["#FFF0F5", "#B38B6D", "#B8860B", "#8B0000"],
-    "vibe": "Classic, Romantic, Retro, European Ornament",
+    "vibe": "Classic, Romantic, Retro, European",
     "previewUrl": "/assets/templates/vintage-preview.jpg"
+  },
+  {
+    "id": "int-oriental-mandarin",
+    "category": "Internasional",
+    "name": "Oriental Mandarin",
+    "description": "Nuansa megah kekaisaran khas orientalis dengan merah terang, lampion halus, dan sapuan kaligrafi tinta emas keberuntungan.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#C41E3A", "#FF0000", "#FFD700", "#FFFAF0"],
+    "vibe": "Oriental, Lucky, Golden, Empire",
+    "previewUrl": "/assets/templates/oriental-preview.jpg"
+  },
+  {
+    "id": "int-mediterranean",
+    "category": "Internasional",
+    "name": "Mediterranean Breeze",
+    "description": "Mengingatkan pada keindahan Pulau Santorini. Putih cerah berpadu dengan aksen biru lautan mediterania dan daun zaitun.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#FFFFFF", "#0047AB", "#ADD8E6", "#808000"],
+    "vibe": "Santorini, Oceanic, Fresh, Olive",
+    "previewUrl": "/assets/templates/mediterranean-preview.jpg"
+  },
+  {
+    "id": "int-hollywood-glam",
+    "category": "Internasional",
+    "name": "Hollywood Glam",
+    "description": "Gaya Art Deco khas tahun 1920-an (The Great Gatsby). Hitam elegan, garis-garis simetris, dan pancaran emas yang luar biasa memukau.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#000000", "#222222", "#D4AF37", "#F0E68C"],
+    "vibe": "Art Deco, Gatsby, Gatsby, Glamour",
+    "previewUrl": "/assets/templates/hollywood-preview.jpg"
+  },
+  {
+    "id": "int-french-chateau",
+    "category": "Internasional",
+    "name": "French Chateau",
+    "description": "Keanggunan istana pedesaan Prancis dengan biru pastel (dusty blue), tipografi keriting (*script*), dan detail arsitektural kastil.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#B0C4DE", "#E6E6FA", "#F8F8FF", "#A9A9A9"],
+    "vibe": "French, Chateau, Dusty Blue, Elegant",
+    "previewUrl": "/assets/templates/french-preview.jpg"
+  },
+  {
+    "id": "int-japanese-zen",
+    "category": "Internasional",
+    "name": "Japanese Zen",
+    "description": "Konsep wabi-sabi Jepang yang ultra-minimalis, menenangkan, dipadu siluet dahan pohon sakura tipis dan latar kayu warna terang.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#FFB7C5", "#FFFFFF", "#DEB887", "#FDF5E6"],
+    "vibe": "Zen, Minimalist, Sakura, Peaceful",
+    "previewUrl": "/assets/templates/japanese-preview.jpg"
+  },
+  {
+    "id": "int-boho-moroccan",
+    "category": "Internasional",
+    "name": "Boho Moroccan",
+    "description": "Kehangatan padang pasir Marrakesh dengan corak mozaik Moorish, lentera kuningan, dan palet warna bumi yang berlapis.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#C19A6B", "#CD853F", "#A0522D", "#F4A460"],
+    "vibe": "Bohemian, Moroccan, Desert, Warm",
+    "previewUrl": "/assets/templates/moroccan-preview.jpg"
+  },
+  {
+    "id": "int-scandinavian",
+    "category": "Internasional",
+    "name": "Scandinavian Minimal",
+    "description": "Praktis, bersih, dan terang. Mengandalkan ruang kosong (*white space*) luas, abu-abu pucat, dan estetika kayu ek ala Nordik.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#F5F5F5", "#E0E0E0", "#9E9E9E", "#D2B48C"],
+    "vibe": "Nordic, Clean, Oak, Bright",
+    "previewUrl": "/assets/templates/scandinavian-preview.jpg"
+  },
+  {
+    "id": "int-indian-royalty",
+    "category": "Internasional",
+    "name": "Indian Royalty",
+    "description": "Ledakan kemeriahan warna khas pernikahan India (Bollywood style) dengan fuchsia, kuning kunyit cerah, dan detail ornamen henna.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#FF00FF", "#FFC0CB", "#FFD700", "#FF4500"],
+    "vibe": "Vibrant, Royal, Festive, Henna",
+    "previewUrl": "/assets/templates/indian-preview.jpg"
+  },
+  {
+    "id": "int-korean-pastel",
+    "category": "Internasional",
+    "name": "Korean Pastel",
+    "description": "Estetika K-Drama yang sangat trendi dengan dominasi warna peach lembut, font hangul-style, dan foto pasangan bergaya studio minimalis.",
+    "priceAddon": 150000,
+    "priceStandalone": 250000,
+    "colors": ["#FFDAB9", "#FFE4B5", "#FFF0F5", "#D8BFD8"],
+    "vibe": "Trendy, K-Drama, Peach, Studio",
+    "previewUrl": "/assets/templates/korean-preview.jpg"
+  },
+  {
+    "id": "int-autumn-new-york",
+    "category": "Internasional",
+    "name": "Autumn in New York",
+    "description": "Suasana romantis musim gugur di Central Park. Menggunakan palet daun gugur (maple), cokelat kopi, dan jingga hangat.",
+    "priceAddon": 200000,
+    "priceStandalone": 350000,
+    "colors": ["#A0522D", "#D2691E", "#FF8C00", "#F5DEB3"],
+    "vibe": "Autumn, Romantic, Maple, Cozy",
+    "previewUrl": "/assets/templates/autumn-preview.jpg"
+  },
+  {
+    "id": "int-tuscan-vineyard",
+    "category": "Internasional",
+    "name": "Tuscan Vineyard",
+    "description": "Pedesaan di wilayah Tuscany, Italia. Menawarkan nuansa warna hijau zaitun, ungu anggur, dan pesona pedesaan Eropa yang elegan.",
+    "priceAddon": 250000,
+    "priceStandalone": 400000,
+    "colors": ["#556B2F", "#808000", "#4B0082", "#F0E68C"],
+    "vibe": "Tuscany, Olive, Vineyard, European",
+    "previewUrl": "/assets/templates/tuscan-preview.jpg"
   }
 ]

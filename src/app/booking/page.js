@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Calendar, User, Phone, MapPin, FileText, CheckCircle, Gift, Sparkles, Send } from "lucide-react";
 import packagesData from "@/data/packages.json";
@@ -30,6 +31,7 @@ function BookingFormContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [waUrl, setWaUrl] = useState("");
+  const [activeThemeCategory, setActiveThemeCategory] = useState("Semua");
 
   // Derived Values
   const selectedPackage = packagesData.find((p) => p.id === selectedPackageId) || null;
@@ -329,29 +331,64 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                     {/* Show theme selector if checked */}
                     {isAddonChecked && (
                       <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4 animate-fade-in">
-                        <label className="text-xs sm:text-sm font-semibold text-slate-300">Pilih Desain Tema Undangan</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {themesData.map((theme) => (
+                        <div className="flex flex-col space-y-3">
+                          <label className="text-xs sm:text-sm font-semibold text-slate-300">Pilih Desain Tema Undangan</label>
+                          <div className="flex flex-wrap gap-2">
+                            {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => (
+                              <button
+                                key={cat}
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); setActiveThemeCategory(cat); }}
+                                className={cn(
+                                  "px-4 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all",
+                                  activeThemeCategory === cat
+                                    ? "bg-gold text-navy-dark"
+                                    : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
+                                )}
+                              >
+                                {cat}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                          {themesData.filter(theme => activeThemeCategory === "Semua" || theme.category === activeThemeCategory).map((theme) => (
                             <div
                               key={theme.id}
                               onClick={() => setSelectedThemeId(theme.id)}
                               className={cn(
-                                "p-4 rounded-xl border text-left cursor-pointer transition-all duration-300",
+                                "relative flex flex-col rounded-xl overflow-hidden cursor-pointer transition-all duration-300",
                                 selectedThemeId === theme.id
-                                  ? "bg-gold/10 border-gold/50 shadow-md shadow-gold/5"
-                                  : "bg-white/5 border-white/5 hover:border-white/10"
+                                  ? "ring-2 ring-gold shadow-[0_0_15px_rgba(212,175,55,0.2)] bg-navy-darker"
+                                  : "bg-white/[0.01] hover:bg-white/[0.03] hover:-translate-y-1"
                               )}
                             >
-                              <h4 className="text-xs sm:text-sm font-bold text-white flex justify-between items-center">
-                                <span>{theme.name}</span>
-                                {selectedThemeId === theme.id && <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />}
-                              </h4>
-                              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                                {theme.description.substring(0, 75)}...
-                              </p>
-                              <div className="mt-3 flex items-center justify-between text-[11px] font-semibold">
-                                <span className="text-gold">Harga: {formatIDR(theme.priceAddon)}</span>
-                                <span className="text-slate-500 uppercase tracking-widest">{theme.vibe.split(',')[0]}</span>
+                              {/* Image Cover */}
+                              <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
+                                <Image 
+                                  src={theme.previewUrl || "/logo-3d.png"} 
+                                  alt={theme.name} 
+                                  fill 
+                                  className="object-cover transition-transform duration-500 hover:scale-105"
+                                />
+                                {/* Gradient Overlay for bottom text */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-navy-darker via-navy-darker/40 to-transparent opacity-90" />
+                                
+                                {/* Content inside image at bottom */}
+                                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 flex flex-col z-10">
+                                  <div className="flex justify-between items-end mb-1">
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gold">
+                                      {theme.vibe.split(',')[0]}
+                                    </span>
+                                    {selectedThemeId === theme.id && <CheckCircle className="w-3.5 h-3.5 text-gold" />}
+                                  </div>
+                                  <h4 className="font-heading font-extrabold text-sm sm:text-base text-white leading-tight">
+                                    {theme.name}
+                                  </h4>
+                                  <div className="mt-1 flex items-center justify-between text-[10px] font-semibold">
+                                    <span className="text-gold">{formatIDR(theme.priceAddon)}</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           ))}

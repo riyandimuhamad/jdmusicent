@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, Heart, FileText, MapPin, Phone, User, Calendar, Send, CheckCircle, Info } from "lucide-react";
+import Image from "next/image";
+import { Sparkles, Heart, FileText, MapPin, Phone, User, Calendar, Send, CheckCircle, Info, Eye, X, Clock } from "lucide-react";
 import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
 
@@ -29,6 +30,8 @@ export default function UndanganPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [waUrl, setWaUrl] = useState("");
+  const [activeCategory, setActiveCategory] = useState("Semua");
+  const [previewThemeId, setPreviewThemeId] = useState(null);
 
   const selectedTheme = themesData.find((t) => t.id === selectedThemeId);
 
@@ -135,81 +138,88 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
           </p>
         </div>
 
+        {/* Categories Tab Navigation */}
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 my-8">
+          {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={cn(
+                "px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300",
+                activeCategory === cat
+                  ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                  : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
         {/* Theme List Selection Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {themesData.map((theme) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
+          {themesData.filter(theme => activeCategory === "Semua" || theme.category === activeCategory).map((theme) => {
             const isSelected = selectedThemeId === theme.id;
             return (
               <div
                 key={theme.id}
                 className={cn(
-                  "glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden transition-all duration-300",
-                  isSelected
-                    ? "border-gold/50 glow-gold scale-100 lg:scale-[1.02] z-10"
-                    : "border-white/5 hover:border-white/15"
+                  "group relative flex flex-col rounded-2xl overflow-hidden bg-white/[0.01] transition-all duration-300",
+                  isSelected 
+                    ? "ring-2 ring-gold shadow-[0_0_20px_rgba(212,175,55,0.15)]" 
+                    : "hover:bg-white/[0.02] hover:-translate-y-1"
                 )}
               >
-                {/* Visual Canvas Backdrop representing Invitation Style Vibe */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-radial-gradient-glow opacity-35 pointer-events-none" />
-
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="font-heading font-extrabold text-lg sm:text-xl text-white">
-                      Tema: {theme.name}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold">
-                      Kesan: {theme.vibe}
-                    </p>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed min-h-[60px]">
-                    {theme.description}
-                  </p>
-
-                  {/* Theme Colors Display */}
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs text-slate-500 font-medium mr-1">Palet Tema:</span>
-                    {theme.colors.map((c, i) => (
-                      <div
-                        key={i}
-                        style={{ backgroundColor: c }}
-                        className="w-4 h-4 rounded-full border border-white/10"
-                        title={c}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Pricing standalone */}
-                  <div className="py-4 border-y border-white/5 flex items-baseline justify-between">
-                    <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
-                    <span className="font-heading font-extrabold text-xl sm:text-2xl text-gold">
-                      {formatIDR(theme.priceStandalone)}
+                {/* Image Cover */}
+                <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
+                  <Image 
+                    src={theme.previewUrl || "/logo-3d.png"} 
+                    alt={theme.name} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* Gradient Overlay for bottom text */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-darker via-navy-darker/20 to-transparent opacity-90" />
+                  
+                  {/* Title & Badge inside image at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 flex flex-col z-10">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1.5">
+                      {theme.vibe.split(',')[0]}
                     </span>
+                    <h3 className="font-heading font-extrabold text-lg text-white leading-tight">
+                      {theme.name}
+                    </h3>
                   </div>
                 </div>
 
-                {/* Select button */}
-                <div className="mt-8 pt-4">
+                {/* Split Buttons Container */}
+                <div className="flex bg-navy-darker/50 border-t border-white/5 relative z-10">
+                  <button
+                    onClick={() => setPreviewThemeId(theme.id)}
+                    className="flex-1 py-3.5 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Preview</span>
+                  </button>
+                  <div className="w-px bg-white/5" />
                   <button
                     onClick={() => {
                       setSelectedThemeId(theme.id);
-                      // Scroll smoothly to form
                       setTimeout(() => {
                         document.getElementById("invitation-form")?.scrollIntoView({ behavior: "smooth" });
                       }, 100);
                     }}
                     className={cn(
-                      "w-full flex items-center justify-center space-x-2 py-3 rounded-xl text-xs font-bold transition-all active:scale-[0.98]",
+                      "flex-1 py-3.5 flex items-center justify-center space-x-1.5 text-xs font-bold transition-colors",
                       isSelected
-                        ? "text-navy-dark bg-gradient-to-r from-gold to-yellow-500 font-bold"
-                        : "text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10"
+                        ? "text-navy-dark bg-gold"
+                        : "text-gold hover:bg-gold/10"
                     )}
                   >
-                    <Heart className="w-3.5 h-3.5 fill-current" />
-                    <span>{isSelected ? "Tema Terpilih" : "Pilih Tema Ini"}</span>
+                    <CheckCircle className="w-4 h-4" />
+                    <span>{isSelected ? "Terpilih" : "Pilih"}</span>
                   </button>
                 </div>
-
               </div>
             );
           })}
@@ -383,7 +393,8 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <span>Waktu / Jam Akad (Contoh: 09:00 WIB - Selesai)</span>
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Waktu / Jam Akad *</span>
                     </label>
                     <input
                       type="text"
@@ -420,7 +431,8 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <span>Waktu / Jam Resepsi (Contoh: 11:00 WIB - Selesai)</span>
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Waktu / Jam Resepsi *</span>
                     </label>
                     <input
                       type="text"
@@ -511,6 +523,113 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
       </div>
 
       </div>
+
+      {/* Preview Modal */}
+      {previewThemeId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-navy-dark border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            {/* Close Button */}
+            <button
+              onClick={() => setPreviewThemeId(null)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Left: Image Full */}
+            <div className="relative w-full md:w-1/2 h-64 md:h-auto bg-black border-b md:border-b-0 md:border-r border-white/10">
+              {(() => {
+                const pTheme = themesData.find(t => t.id === previewThemeId);
+                return (
+                  <Image 
+                    src={pTheme?.previewUrl || "/logo-3d.png"} 
+                    alt={pTheme?.name || "Preview"} 
+                    fill 
+                    className="object-cover"
+                  />
+                );
+              })()}
+            </div>
+
+            {/* Right: Content */}
+            <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between overflow-y-auto custom-scrollbar bg-navy-darker/50">
+              {(() => {
+                const pTheme = themesData.find(t => t.id === previewThemeId);
+                if (!pTheme) return null;
+                const isSelected = selectedThemeId === pTheme.id;
+                
+                return (
+                  <>
+                    <div className="space-y-6">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1 block">
+                          Kesan: {pTheme.vibe}
+                        </span>
+                        <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-white">
+                          {pTheme.name}
+                        </h3>
+                      </div>
+
+                      <p className="text-sm text-slate-300 leading-relaxed">
+                        {pTheme.description}
+                      </p>
+
+                      <div className="space-y-2">
+                        <span className="text-xs text-slate-500 font-medium">Palet Warna Utama:</span>
+                        <div className="flex items-center space-x-3 pt-1">
+                          {pTheme.colors.map((c, i) => (
+                            <div
+                              key={i}
+                              style={{ backgroundColor: c }}
+                              className="w-8 h-8 rounded-full border-2 border-white/10 shadow-inner"
+                              title={c}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="py-4 border-y border-white/5 flex flex-col space-y-1">
+                        <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
+                        <span className="font-heading font-extrabold text-2xl text-gold">
+                          {formatIDR(pTheme.priceStandalone)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-8 pt-4">
+                      <button
+                        onClick={() => {
+                          setSelectedThemeId(pTheme.id);
+                          setPreviewThemeId(null);
+                          setTimeout(() => {
+                            document.getElementById("invitation-form")?.scrollIntoView({ behavior: "smooth" });
+                          }, 100);
+                        }}
+                        className={cn(
+                          "w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98]",
+                          isSelected
+                            ? "text-navy-dark bg-gradient-to-r from-gold to-yellow-500 shadow-lg shadow-gold/20"
+                            : "text-navy-dark bg-white hover:bg-slate-200"
+                        )}
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        <span>{isSelected ? "Tema Ini Sedang Terpilih" : "Pilih Tema Ini"}</span>
+                      </button>
+
+                      <button
+                        onClick={() => window.open(`/demo/${pTheme.id}`, '_blank')}
+                        className="w-full mt-3 flex items-center justify-center space-x-2 py-3 rounded-xl border border-white/20 text-xs font-semibold text-slate-300 hover:bg-white/10 transition-colors"
+                      >
+                        <span>Lihat Demo Lengkap (Sistem Tema)</span>
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Success Modal Confirmation */}
       {showSuccessModal && (

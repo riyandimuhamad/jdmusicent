@@ -12,6 +12,8 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
+  if (pathname.startsWith('/demo')) return null;
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {

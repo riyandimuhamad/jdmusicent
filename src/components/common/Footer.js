@@ -1,10 +1,16 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Music, Mail, Phone, MapPin, Clock } from "lucide-react";
 
 export default function Footer() {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear() || 2026;
+
+  if (pathname.startsWith('/demo')) return null;
 
   return (
     <footer className="bg-navy-dark border-t border-white/5 relative z-10">
