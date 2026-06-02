@@ -31,7 +31,14 @@ export default function UndanganPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [waUrl, setWaUrl] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [activeTier, setActiveTier] = useState("Semua");
   const [previewThemeId, setPreviewThemeId] = useState(null);
+
+  const getThemeTier = (price) => {
+    if (price <= 300000) return 'Premium';
+    if (price === 350000) return 'Eksklusif';
+    return 'Luxury';
+  };
 
   const selectedTheme = themesData.find((t) => t.id === selectedThemeId);
 
@@ -119,7 +126,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
       {/* Background Radial Glow */}
       <div className="absolute top-[10%] right-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
 
-      <div className="max-w-7xl mx-auto space-y-16 relative z-10">
+      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -139,69 +146,123 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
         </div>
 
         {/* Categories Tab Navigation */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 my-8">
-          {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300",
-                activeCategory === cat
-                  ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-                  : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex flex-col items-center space-y-4 pt-4">
+          {/* Baris 1: Filter Budaya (INDUK - Statis) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => {
+              // Menghitung total absolut di database (Statis)
+              const count = cat === "Semua" ? themesData.length : themesData.filter(t => t.category === cat).length;
+              
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={cn(
+                    "px-5 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 flex items-center space-x-2 border",
+                    activeCategory === cat
+                      ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                  )}
+                >
+                  <span>{cat}</span>
+                  <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeCategory === cat ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Baris 2: Filter Kasta (ANAK - Dinamis terhadap Budaya) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {["Semua", "Premium", "Eksklusif", "Luxury"].map((tier) => {
+              // Menghitung distribusi kasta berdasarkan Budaya yang sedang aktif
+              const count = themesData.filter(t => 
+                (activeCategory === "Semua" || t.category === activeCategory) && 
+                (tier === "Semua" || getThemeTier(t.priceStandalone) === tier)
+              ).length;
+              
+              return (
+                <button
+                  key={tier}
+                  onClick={() => setActiveTier(tier)}
+                  className={cn(
+                    "px-5 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 flex items-center space-x-2 border",
+                    activeTier === tier
+                      ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                  )}
+                >
+                  <span>{tier}</span>
+                  <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTier === tier ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Theme List Selection Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8">
-          {themesData.filter(theme => activeCategory === "Semua" || theme.category === activeCategory).map((theme) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 pt-4">
+          {themesData.filter(theme => {
+            const matchCategory = activeCategory === "Semua" || theme.category === activeCategory;
+            const matchTier = activeTier === "Semua" || getThemeTier(theme.priceStandalone) === activeTier;
+            return matchCategory && matchTier;
+          }).map((theme) => {
             const isSelected = selectedThemeId === theme.id;
             return (
               <div
                 key={theme.id}
                 className={cn(
-                  "group relative flex flex-col rounded-2xl overflow-hidden bg-white/[0.01] transition-all duration-300",
+                  "group relative flex flex-col rounded-3xl overflow-hidden bg-navy-darker/50 border border-white/5 transition-all duration-300",
                   isSelected 
-                    ? "ring-2 ring-gold shadow-[0_0_20px_rgba(212,175,55,0.15)]" 
-                    : "hover:bg-white/[0.02] hover:-translate-y-1"
+                    ? "ring-2 ring-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]" 
+                    : "hover:-translate-y-2 hover:shadow-2xl hover:border-gold/30"
                 )}
               >
-                {/* Image Cover */}
-                <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
-                  <Image 
-                    src={theme.previewUrl || "/logo-3d.png"} 
-                    alt={theme.name} 
-                    fill 
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Gradient Overlay for bottom text */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-darker via-navy-darker/20 to-transparent opacity-90" />
-                  
-                  {/* Title & Badge inside image at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 flex flex-col z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1.5">
-                      {theme.vibe.split(',')[0]}
-                    </span>
-                    <h3 className="font-heading font-extrabold text-lg text-white leading-tight">
-                      {theme.name}
-                    </h3>
+                {/* Top Pill Title */}
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-navy-dark/90 backdrop-blur-sm border border-gold/30 px-4 py-1.5 rounded-full shadow-lg max-w-[80%]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gold whitespace-nowrap block truncate">
+                    {theme.name}
+                  </span>
+                </div>
+                
+                {/* Badge Bottom Left */}
+                <div className={cn(
+                  "absolute bottom-16 left-0 z-20 px-3 py-1.5 rounded-tr-xl text-[9px] font-bold uppercase tracking-widest shadow-md",
+                  getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-900/90 text-purple-200 border-r border-t border-purple-500/30" :
+                  getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gold/90 text-navy-dark" :
+                  "bg-blue-900/90 text-blue-200 border-r border-t border-blue-500/30"
+                )}>
+                  {getThemeTier(theme.priceStandalone)}
+                </div>
+
+                {/* Image Cover (Mockup Style in Dark Mode) */}
+                <div className="relative w-full aspect-[4/5] flex items-center justify-center p-6 sm:p-8 bg-gradient-to-b from-white/5 to-transparent">
+                  <div className="relative w-full h-full bg-navy-dark rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden border-[4px] border-white/10 group-hover:border-gold/40 transition-colors duration-500">
+                    <Image 
+                      src={theme.previewUrl || "/logo-3d.png"} 
+                      alt={theme.name} 
+                      fill 
+                      className="object-cover"
+                    />
+                    
+                    {/* Hover Play Button Overlay (HANYA DI DALAM GAMBAR) */}
+                    <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                      <div className="w-12 h-12 bg-gold/90 backdrop-blur-sm rounded-full flex items-center justify-center pl-1 shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+                        <svg className="w-5 h-5 text-navy-dark" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z" /></svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Split Buttons Container */}
-                <div className="flex bg-navy-darker/50 border-t border-white/5 relative z-10">
+                <div className="flex bg-navy-darker relative z-10 border-t border-white/10">
                   <button
                     onClick={() => setPreviewThemeId(theme.id)}
-                    className="flex-1 py-3.5 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                    className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
                   >
                     <Eye className="w-4 h-4" />
                     <span>Preview</span>
                   </button>
-                  <div className="w-px bg-white/5" />
+                  <div className="w-px bg-white/10" />
                   <button
                     onClick={() => {
                       setSelectedThemeId(theme.id);
@@ -210,7 +271,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                       }, 100);
                     }}
                     className={cn(
-                      "flex-1 py-3.5 flex items-center justify-center space-x-1.5 text-xs font-bold transition-colors",
+                      "flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-bold transition-colors",
                       isSelected
                         ? "text-navy-dark bg-gold"
                         : "text-gold hover:bg-gold/10"
