@@ -323,6 +323,9 @@ export default function UndanganPage() {
                       <div className="py-4 border-y border-white/5 flex flex-col space-y-1">
                         <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
                         <div className="flex flex-col space-y-0.5 pt-1">
+                          <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
+                            {formatIDR(getOriginalPrice(pTheme.priceStandalone))}
+                          </span>
                           <div className="flex items-end space-x-3">
                             <span className="font-heading font-black text-3xl text-gold drop-shadow-md leading-none">
                               {formatIDR(pTheme.priceStandalone)}
@@ -331,9 +334,6 @@ export default function UndanganPage() {
                               Diskon {getDiscountPercentage(pTheme.priceStandalone)}%
                             </span>
                           </div>
-                          <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2">
-                            {formatIDR(getOriginalPrice(pTheme.priceStandalone))}
-                          </span>
                         </div>
                       </div>
                     </div>
