@@ -3,120 +3,90 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Sparkles, Heart, FileText, MapPin, Phone, User, Calendar, Send, CheckCircle, Info, Eye, X, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
 
 export default function UndanganPage() {
-  const [selectedThemeId, setSelectedThemeId] = useState(null);
+  const router = useRouter();
   
-  // Invitation Details Form
-  const [formData, setFormData] = useState({
-    clientName: "",
-    clientWhatsapp: "",
-    groomName: "",
-    groomNameShort: "",
-    brideName: "",
-    brideNameShort: "",
-    akadDate: "",
-    akadTime: "",
-    resepsiDate: "",
-    resepsiTime: "",
-    venue: "",
-    mapsLink: "",
-    notes: ""
-  });
-
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [waUrl, setWaUrl] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [activeTier, setActiveTier] = useState("Semua");
   const [previewThemeId, setPreviewThemeId] = useState(null);
 
+  const categoryMap = {
+    "Lokal": "Nusantara Heritage",
+    "Nasional": "Modern Elegance",
+    "Internasional": "Global Signature"
+  };
+
   const getThemeTier = (price) => {
-    if (price <= 300000) return 'Premium';
-    if (price === 350000) return 'Eksklusif';
+    if (price <= 115000) return 'Premium';
+    if (price === 140000) return 'Eksklusif';
     return 'Luxury';
   };
 
-  const selectedTheme = themesData.find((t) => t.id === selectedThemeId);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: null }));
-    }
+  const getOriginalPrice = (price) => {
+    if (price <= 115000) return 150000; // ~23% discount
+    if (price === 140000) return 200000; // ~30% discount
+    return 265000; // ~30% discount
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.clientName.trim()) newErrors.clientName = "Nama lengkap Anda wajib diisi.";
-    
-    if (!formData.clientWhatsapp.trim()) {
-      newErrors.clientWhatsapp = "Nomor WhatsApp wajib diisi.";
-    } else {
-      const waRegex = /^(08|62|\+62)[0-9]{8,13}$/;
-      if (!waRegex.test(formData.clientWhatsapp.replace(/\s+/g, ""))) {
-        newErrors.clientWhatsapp = "Format nomor WhatsApp tidak valid.";
-      }
-    }
-
-    if (!formData.groomName.trim()) newErrors.groomName = "Nama lengkap mempelai pria wajib diisi.";
-    if (!formData.brideName.trim()) newErrors.brideName = "Nama lengkap mempelai wanita wajib diisi.";
-    
-    if (!formData.akadDate) newErrors.akadDate = "Tanggal akad nikah wajib diisi.";
-    if (!formData.resepsiDate) newErrors.resepsiDate = "Tanggal resepsi pernikahan wajib diisi.";
-    if (!formData.venue.trim()) newErrors.venue = "Nama & alamat venue wajib diisi.";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const getDiscountPercentage = (price) => {
+    const original = getOriginalPrice(price);
+    return Math.round(((original - price) / original) * 100);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    setIsSubmitting(true);
-
-    const formatDate = (dateString) => {
-      if (!dateString) return "";
-      return dateString.split("-").reverse().join("/");
-    };
-
-    const adminWhatsapp = process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"; 
-
-    const message = `Halo Admin JD Music! Saya ingin memesan pembuatan Undangan Digital:
-
-*DETAIL PEMESANAN*
-Nama Klien : ${formData.clientName}
-WhatsApp   : ${formData.clientWhatsapp}
-Tema Pilihan: ${selectedTheme.name}
-
-*DATA PERNIKAHAN*
-Mempelai Pria  : ${formData.groomName} (${formData.groomNameShort || "-"})
-Mempelai Wanita: ${formData.brideName} (${formData.brideNameShort || "-"})
-Tanggal Akad   : ${formatDate(formData.akadDate)} @ ${formData.akadTime || "09.00 - Selesai"}
-Tanggal Resepsi: ${formatDate(formData.resepsiDate)} @ ${formData.resepsiTime || "11.00 - Selesai"}
-Lokasi/Venue   : ${formData.venue}
-Link Gmaps     : ${formData.mapsLink || "-"}
-
-*Catatan Khusus*: 
-${formData.notes.trim() || "-"}
-
-Total Harga    : ${formatIDR(selectedTheme.priceStandalone)}
-
-Tolong bantu proses undangan saya ya. Terima kasih!`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${adminWhatsapp}?text=${encodedMessage}`;
-
-    // Simpan URL dan buka modal (menghindari popup blocker)
-    setWaUrl(whatsappUrl);
-
-    setIsSubmitting(false);
-    setShowSuccessModal(true);
+  const getThemeTitleColor = (id) => {
+    switch(id) {
+      // LOKAL
+      case "lokal-sunda-priangan": return "#A7F3D0"; // Sage Green Light
+      case "lokal-sunda-cirebonan": return "#FCA5A5"; // Megamendung Red accent
+      case "lokal-sunda-banten": return "#FDE047"; // Sultanate Gold/Yellow
+      case "lokal-sunda-pasundan": return "#FDBA74"; // Earthy Tan
+      case "lokal-javanese-heritage": return "#FCD34D"; // Classic Gold
+      case "lokal-jawa-keraton": return "#86EFAC"; // Keraton Green
+      case "lokal-balinese-agung": return "#FEF08A"; // Bright Bali Yellow
+      case "lokal-minang-gadang": return "#F87171"; // Gadang Red
+      case "lokal-batak-ulos": return "#FB923C"; // Ulos Orange/Red
+      case "lokal-bugis-mappacci": return "#6EE7B7"; // Emerald Green
+      case "lokal-dayak-borneo": return "#FDE047"; // Dayak Yellow
+      case "lokal-palembang-sriwijaya": return "#FDA4AF"; // Songket Pink/Red
+      case "lokal-betawi-pesisir": return "#F9A8D4"; // Betawi Pink
+      case "lokal-maluku-mutiara": return "#7DD3FC"; // Ocean Blue
+      case "lokal-ntt-tenun": return "#FB7185"; // Sunset Rose/Orange
+      case "lokal-papua-asmat": return "#F59E0B"; // Earthy Amber
+      
+      // NASIONAL
+      case "nasional-modern-minimalist": return "#F3F4F6"; // White/Gray
+      case "nasional-rustic-warmth": return "#FDE047"; // Warm Sand
+      case "nasional-monochrome-elegance": return "#FFFFFF"; // Pure White
+      case "nasional-blush-peony": return "#F9A8D4"; // Soft Pink
+      case "nasional-royal-navy-gold": return "#93C5FD"; // Navy/Blue
+      case "nasional-emerald-botanical": return "#6EE7B7"; // Botanical Green
+      case "nasional-terracotta-sunset": return "#FB923C"; // Terracotta
+      case "nasional-sapphire-starlight": return "#A5B4FC"; // Sapphire Blue
+      case "nasional-ivory-pearl": return "#FEF3C7"; // Ivory
+      case "nasional-rose-gold": return "#FDA4AF"; // Rose Gold
+      case "nasional-classic-marble": return "#E2E8F0"; // Marble Gray
+      case "nasional-champagne": return "#FDE047"; // Champagne
+      
+      // INTERNASIONAL
+      case "int-victorian-classic": return "#FBCFE8"; // Victorian Pink
+      case "int-oriental-mandarin": return "#FCA5A5"; // Mandarin Red
+      case "int-mediterranean": return "#7DD3FC"; // Mediterranean Blue
+      case "int-hollywood-glam": return "#FCD34D"; // Glam Gold
+      case "int-french-chateau": return "#BAE6FD"; // Dusty Blue
+      case "int-japanese-zen": return "#FECDD3"; // Sakura Pink
+      case "int-boho-moroccan": return "#FBBF24"; // Moroccan Amber
+      case "int-scandinavian": return "#E5E7EB"; // Scandi Gray
+      case "int-indian-royalty": return "#F0ABFC"; // Fuchsia/Purple
+      case "int-korean-pastel": return "#FED7AA"; // Peach
+      case "int-autumn-new-york": return "#FB923C"; // Autumn Orange
+      case "int-tuscan-vineyard": return "#A3E635"; // Olive Green
+      
+      default: return "#D4AF37"; // Default Gold
+    }
   };
 
   return (
@@ -134,7 +104,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
             <Heart className="w-3.5 h-3.5 text-gold animate-pulse" />
             <span>Undangan Digital Standalone</span>
           </div>
-          <h1 className="font-heading font-extrabold text-3xl sm:text-5xl text-white tracking-tight">
+          <h1 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight">
             Desain Undangan Digital <br />
             <span className="bg-gradient-to-r from-gold via-gold-champagne to-electric bg-clip-text text-transparent text-glow-gold">
               Eksklusif & Mewah
@@ -148,31 +118,32 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
         {/* Categories Tab Navigation */}
         <div className="flex flex-col items-center space-y-4 pt-4">
           {/* Baris 1: Filter Budaya (INDUK - Statis) */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => {
               // Menghitung total absolut di database (Statis)
               const count = cat === "Semua" ? themesData.length : themesData.filter(t => t.category === cat).length;
+              const displayCat = cat === "Semua" ? "Semua" : categoryMap[cat];
               
               return (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
                   className={cn(
-                    "px-5 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 flex items-center space-x-2 border",
+                    "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
                     activeCategory === cat
                       ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
                       : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
                   )}
                 >
-                  <span>{cat}</span>
-                  <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeCategory === cat ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                  <span>{displayCat}</span>
+                  <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeCategory === cat ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
                 </button>
               )
             })}
           </div>
 
           {/* Baris 2: Filter Kasta (ANAK - Dinamis terhadap Budaya) */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
             {["Semua", "Premium", "Eksklusif", "Luxury"].map((tier) => {
               // Menghitung distribusi kasta berdasarkan Budaya yang sedang aktif
               const count = themesData.filter(t => 
@@ -185,14 +156,14 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                   key={tier}
                   onClick={() => setActiveTier(tier)}
                   className={cn(
-                    "px-5 py-2 rounded-full text-xs sm:text-sm font-bold tracking-wide transition-all duration-300 flex items-center space-x-2 border",
+                    "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
                     activeTier === tier
                       ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
                       : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
                   )}
                 >
                   <span>{tier}</span>
-                  <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTier === tier ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                  <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeTier === tier ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
                 </button>
               )
             })}
@@ -206,37 +177,31 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
             const matchTier = activeTier === "Semua" || getThemeTier(theme.priceStandalone) === activeTier;
             return matchCategory && matchTier;
           }).map((theme) => {
-            const isSelected = selectedThemeId === theme.id;
             return (
               <div
                 key={theme.id}
-                className={cn(
-                  "group relative flex flex-col rounded-3xl overflow-hidden bg-navy-darker/50 border border-white/5 transition-all duration-300",
-                  isSelected 
-                    ? "ring-2 ring-gold shadow-[0_0_20px_rgba(212,175,55,0.2)]" 
-                    : "hover:-translate-y-2 hover:shadow-2xl hover:border-gold/30"
-                )}
+                className="group relative flex flex-col rounded-2xl overflow-hidden bg-navy-darker/50 border border-white/5 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-gold/30"
               >
-                {/* Top Pill Title */}
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-navy-dark/90 backdrop-blur-sm border border-gold/30 px-4 py-1.5 rounded-full shadow-lg max-w-[80%]">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gold whitespace-nowrap block truncate">
-                    {theme.name}
-                  </span>
-                </div>
-                
-                {/* Badge Bottom Left */}
-                <div className={cn(
-                  "absolute bottom-16 left-0 z-20 px-3 py-1.5 rounded-tr-xl text-[9px] font-bold uppercase tracking-widest shadow-md",
-                  getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-900/90 text-purple-200 border-r border-t border-purple-500/30" :
-                  getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gold/90 text-navy-dark" :
-                  "bg-blue-900/90 text-blue-200 border-r border-t border-blue-500/30"
-                )}>
-                  {getThemeTier(theme.priceStandalone)}
-                </div>
+                {/* Diagonal Ribbon Badge (Top Left Slanted) */}
+                {activeTier === "Semua" && (
+                  <div className="absolute top-5 -left-10 w-40 -rotate-45 z-30 pointer-events-none">
+                    <div className={cn(
+                      "w-full text-center py-1.5 shadow-lg text-[9px] font-black uppercase tracking-widest",
+                      getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]" :
+                      getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]" :
+                      "bg-emerald-600 text-white shadow-[0_0_15px_rgba(5,150,105,0.4)]"
+                    )}>
+                      {getThemeTier(theme.priceStandalone)}
+                    </div>
+                  </div>
+                )}
 
                 {/* Image Cover (Mockup Style in Dark Mode) */}
-                <div className="relative w-full aspect-[4/5] flex items-center justify-center p-6 sm:p-8 bg-gradient-to-b from-white/5 to-transparent">
-                  <div className="relative w-full h-full bg-navy-dark rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden border-[4px] border-white/10 group-hover:border-gold/40 transition-colors duration-500">
+                <div 
+                  className="relative w-full aspect-[4/5] flex items-center justify-center px-6 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent cursor-pointer group/img"
+                  onClick={() => setPreviewThemeId(theme.id)}
+                >
+                  <div className="relative w-full h-full bg-navy-dark rounded-xl shadow-xl overflow-hidden border border-white/10 group-hover/img:border-gold/50 transition-colors duration-500">
                     <Image 
                       src={theme.previewUrl || "/logo-3d.png"} 
                       alt={theme.name} 
@@ -245,12 +210,22 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                     />
                     
                     {/* Hover Play Button Overlay (HANYA DI DALAM GAMBAR) */}
-                    <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                    <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <div className="w-12 h-12 bg-gold/90 backdrop-blur-sm rounded-full flex items-center justify-center pl-1 shadow-[0_0_30px_rgba(212,175,55,0.4)]">
                         <svg className="w-5 h-5 text-navy-dark" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z" /></svg>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Info & Title Section (Centered Below Image) */}
+                <div className="w-full flex items-center justify-center px-4 pt-2 pb-5 bg-transparent relative z-20">
+                  <h4 
+                    className="font-heading font-extrabold text-sm sm:text-base uppercase tracking-widest truncate text-center w-full drop-shadow-md"
+                    style={{ color: getThemeTitleColor(theme.id) }}
+                  >
+                    {theme.name}
+                  </h4>
                 </div>
 
                 {/* Split Buttons Container */}
@@ -264,21 +239,11 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                   </button>
                   <div className="w-px bg-white/10" />
                   <button
-                    onClick={() => {
-                      setSelectedThemeId(theme.id);
-                      setTimeout(() => {
-                        document.getElementById("invitation-form")?.scrollIntoView({ behavior: "smooth" });
-                      }, 100);
-                    }}
-                    className={cn(
-                      "flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-bold transition-colors",
-                      isSelected
-                        ? "text-navy-dark bg-gold"
-                        : "text-gold hover:bg-gold/10"
-                    )}
+                    onClick={() => router.push(`/undangan/booking?themeId=${theme.id}`)}
+                    className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-bold text-gold hover:bg-gold/10 transition-colors"
                   >
                     <CheckCircle className="w-4 h-4" />
-                    <span>{isSelected ? "Terpilih" : "Pilih"}</span>
+                    <span>Pilih</span>
                   </button>
                 </div>
               </div>
@@ -286,300 +251,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
           })}
         </div>
 
-        {/* Dynamic Personalization Form */}
-        {selectedThemeId && (
-          <div id="invitation-form" className="max-w-4xl mx-auto glass-card p-6 sm:p-10 rounded-3xl border border-gold/20 shadow-2xl relative overflow-hidden glow-gold animate-fade-in">
-            <div className="absolute top-0 left-0 w-48 h-48 bg-radial-gradient-glow opacity-25 pointer-events-none" />
 
-            <div className="text-center mb-8 space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-gold">Langkah Kedua</span>
-              <h3 className="font-heading font-extrabold text-xl sm:text-2xl text-white">
-                Personalisasi Undangan - Tema {selectedTheme.name}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-400">
-                Silakan isi data pengantin dan detail akad/resepsi di bawah. Admin akan langsung menyusun rancangan undangan digital Anda.
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Form Section 1: Client info */}
-              <div className="space-y-4">
-                <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
-                  1. Data Kontak Pemesan
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
-                      <User className="w-4 h-4 text-gold" />
-                      <span>Nama Pemesan *</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="clientName"
-                      value={formData.clientName}
-                      onChange={handleInputChange}
-                      placeholder="Nama Lengkap Anda"
-                      className={cn(
-                        "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
-                        errors.clientName ? "border-red-500/50" : "border-white/10"
-                      )}
-                    />
-                    {errors.clientName && <p className="text-xs text-red-400 pl-1">{errors.clientName}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
-                      <Phone className="w-4 h-4 text-gold" />
-                      <span>Nomor WhatsApp Aktif *</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="clientWhatsapp"
-                      value={formData.clientWhatsapp}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: 081234567890"
-                      className={cn(
-                        "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
-                        errors.clientWhatsapp ? "border-red-500/50" : "border-white/10"
-                      )}
-                    />
-                    {errors.clientWhatsapp && <p className="text-xs text-red-400 pl-1">{errors.clientWhatsapp}</p>}
-                  </div>
-                </div>
-              </div>
-
-              {/* Form Section 2: Couple info */}
-              <div className="space-y-4">
-                <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
-                  2. Nama Mempelai Pengantin
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {/* Groom */}
-                  <div className="space-y-3 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
-                    <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-slate-300 flex items-center space-x-1">
-                      <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
-                      <span>Mempelai Pria</span>
-                    </h5>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Nama Lengkap *</label>
-                      <input
-                        type="text"
-                        name="groomName"
-                        value={formData.groomName}
-                        onChange={handleInputChange}
-                        placeholder="Contoh: Adam Alamsyah, S.T."
-                        className={cn(
-                          "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
-                          errors.groomName ? "border-red-500/50" : "border-white/10"
-                        )}
-                      />
-                      {errors.groomName && <p className="text-xs text-red-400 pl-1">{errors.groomName}</p>}
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Nama Panggilan (Short)</label>
-                      <input
-                        type="text"
-                        name="groomNameShort"
-                        value={formData.groomNameShort}
-                        onChange={handleInputChange}
-                        placeholder="Contoh: Adam"
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Bride */}
-                  <div className="space-y-3 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
-                    <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-slate-300 flex items-center space-x-1">
-                      <span className="w-1.5 h-1.5 bg-pink-400 rounded-full" />
-                      <span>Mempelai Wanita</span>
-                    </h5>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Nama Lengkap *</label>
-                      <input
-                        type="text"
-                        name="brideName"
-                        value={formData.brideName}
-                        onChange={handleInputChange}
-                        placeholder="Contoh: Revi Amalia, S.Ak."
-                        className={cn(
-                          "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
-                          errors.brideName ? "border-red-500/50" : "border-white/10"
-                        )}
-                      />
-                      {errors.brideName && <p className="text-xs text-red-400 pl-1">{errors.brideName}</p>}
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400">Nama Panggilan (Short)</label>
-                      <input
-                        type="text"
-                        name="brideNameShort"
-                        value={formData.brideNameShort}
-                        onChange={handleInputChange}
-                        placeholder="Contoh: Revi"
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Form Section 3: Event details */}
-              <div className="space-y-4">
-                <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
-                  3. Detail Pelaksanaan Acara
-                </h4>
-                
-                {/* Akad nikah details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
-                  <div className="space-y-1 sm:col-span-2">
-                    <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-gold">A. Akad Nikah</h5>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Tanggal Akad *</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="akadDate"
-                      value={formData.akadDate}
-                      onChange={handleInputChange}
-                      className={cn(
-                        "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white focus:outline-none focus:border-gold scheme-dark",
-                        errors.akadDate ? "border-red-500/50" : "border-white/10"
-                      )}
-                    />
-                    {errors.akadDate && <p className="text-xs text-red-400 pl-1">{errors.akadDate}</p>}
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>Waktu / Jam Akad *</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="akadTime"
-                      value={formData.akadTime}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: 08.00 - 10.00 WIB"
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold"
-                    />
-                  </div>
-                </div>
-
-                {/* Resepsi details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
-                  <div className="space-y-1 sm:col-span-2">
-                    <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-gold">B. Resepsi Pernikahan</h5>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Tanggal Resepsi *</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="resepsiDate"
-                      value={formData.resepsiDate}
-                      onChange={handleInputChange}
-                      className={cn(
-                        "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white focus:outline-none focus:border-gold scheme-dark",
-                        errors.resepsiDate ? "border-red-500/50" : "border-white/10"
-                      )}
-                    />
-                    {errors.resepsiDate && <p className="text-xs text-red-400 pl-1">{errors.resepsiDate}</p>}
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400 flex items-center space-x-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>Waktu / Jam Resepsi *</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="resepsiTime"
-                      value={formData.resepsiTime}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: 11.00 - 14.00 WIB"
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold"
-                    />
-                  </div>
-                </div>
-
-                {/* Location & Map details */}
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
-                      <MapPin className="w-4 h-4 text-gold" />
-                      <span>Nama & Alamat Lengkap Venue *</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="venue"
-                      value={formData.venue}
-                      onChange={handleInputChange}
-                      placeholder="Contoh: Sheraton Hotel, Lt. 2 Ballroom, Bandung"
-                      className={cn(
-                        "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
-                        errors.venue ? "border-red-500/50" : "border-white/10"
-                      )}
-                    />
-                    {errors.venue && <p className="text-xs text-red-400 pl-1">{errors.venue}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-300">Link Google Maps Lokasi (Opsional)</label>
-                    <input
-                      type="text"
-                      name="mapsLink"
-                      value={formData.mapsLink}
-                      onChange={handleInputChange}
-                      placeholder="https://maps.google.com/?q=Sheraton..."
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Form Section 4: Notes */}
-              <div className="space-y-4">
-                <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
-                  4. Catatan & Keterangan Tambahan
-                </h4>
-                <div className="space-y-1">
-                  <textarea
-                    name="notes"
-                    value={formData.notes}
-                    onChange={handleInputChange}
-                    rows={3}
-                    placeholder="Contoh: request warna tema pastel, tambah menu RSVP checklist kehadiran, link video prewedding, dll."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors resize-none"
-                  />
-                </div>
-              </div>
-
-              {/* Summary & Submit */}
-              <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div className="space-y-1 text-center sm:text-left">
-                  <span className="text-xs text-slate-400 font-medium">Total Harga Standalone:</span>
-                  <div className="font-heading font-black text-2xl text-gold">
-                    {formatIDR(selectedTheme.priceStandalone)}
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-4 rounded-xl font-bold text-navy-dark bg-gradient-to-r from-gold to-yellow-500 hover:from-yellow-600 hover:to-gold active:scale-[0.98] transition-all duration-300 shadow-lg shadow-gold/15"
-                >
-                  <Send className="w-5 h-5" />
-                  <span>{isSubmitting ? "Memproses..." : "Kirim Form Undangan via WhatsApp"}</span>
-                </button>
-              </div>
-
-            </form>
-          </div>
-        )}
 
       </div>
 
@@ -617,7 +289,6 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
               {(() => {
                 const pTheme = themesData.find(t => t.id === previewThemeId);
                 if (!pTheme) return null;
-                const isSelected = selectedThemeId === pTheme.id;
                 
                 return (
                   <>
@@ -651,30 +322,29 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
 
                       <div className="py-4 border-y border-white/5 flex flex-col space-y-1">
                         <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
-                        <span className="font-heading font-extrabold text-2xl text-gold">
-                          {formatIDR(pTheme.priceStandalone)}
-                        </span>
+                        <div className="flex flex-col space-y-0.5 pt-1">
+                          <div className="flex items-end space-x-3">
+                            <span className="font-heading font-black text-3xl text-gold drop-shadow-md leading-none">
+                              {formatIDR(pTheme.priceStandalone)}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
+                              Diskon {getDiscountPercentage(pTheme.priceStandalone)}%
+                            </span>
+                          </div>
+                          <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2">
+                            {formatIDR(getOriginalPrice(pTheme.priceStandalone))}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
                     <div className="mt-8 pt-4">
                       <button
-                        onClick={() => {
-                          setSelectedThemeId(pTheme.id);
-                          setPreviewThemeId(null);
-                          setTimeout(() => {
-                            document.getElementById("invitation-form")?.scrollIntoView({ behavior: "smooth" });
-                          }, 100);
-                        }}
-                        className={cn(
-                          "w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98]",
-                          isSelected
-                            ? "text-navy-dark bg-gradient-to-r from-gold to-yellow-500 shadow-lg shadow-gold/20"
-                            : "text-navy-dark bg-white hover:bg-slate-200"
-                        )}
+                        onClick={() => router.push(`/undangan/booking?themeId=${pTheme.id}`)}
+                        className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl text-sm font-bold text-navy-dark bg-white hover:bg-slate-200 transition-all active:scale-[0.98]"
                       >
                         <CheckCircle className="w-4 h-4" />
-                        <span>{isSelected ? "Tema Ini Sedang Terpilih" : "Pilih Tema Ini"}</span>
+                        <span>Pilih Tema Ini</span>
                       </button>
 
                       <button
@@ -692,56 +362,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
         </div>
       )}
 
-      {/* Success Modal Confirmation */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div onClick={() => setShowSuccessModal(false)} className="absolute inset-0 bg-navy-dark/90 backdrop-blur-md" />
-          
-          <div className="relative glass-card border border-gold/30 rounded-3xl p-8 max-w-md text-center space-y-6 shadow-2xl z-10 glow-gold animate-fade-in">
-            <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-gold" />
-            </div>
-            
-            <div className="space-y-2">
-              <h3 className="font-heading font-extrabold text-xl text-white">Satu Langkah Lagi!</h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Rincian data pengantin Anda telah direkap. Sistem kami sedang membuka aplikasi WhatsApp Anda.
-              </p>
-            </div>
 
-            <div className="p-4 rounded-xl bg-gold/10 border border-gold/20 text-xs text-slate-300 space-y-3 text-left">
-              <p className="text-gold font-bold text-center">⚠️ PERHATIAN</p>
-              <p>Sistem <strong>belum</strong> mengirimkan data secara otomatis. Silakan klik tombol hijau di bawah ini untuk membuka WhatsApp.</p>
-              <p>Mohon tekan tombol <strong>KIRIM (Send)</strong> di aplikasi WhatsApp Anda agar pesan tersebut masuk ke Admin JD Music untuk segera diproses.</p>
-            </div>
-
-            <div className="pt-2 flex flex-col gap-3">
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  setTimeout(() => {
-                    setShowSuccessModal(false);
-                  }, 1000);
-                }}
-                className="w-full flex items-center justify-center space-x-2 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg shadow-green-500/25"
-              >
-                <span>Buka WhatsApp Sekarang</span>
-              </a>
-              <button
-                onClick={() => {
-                  setShowSuccessModal(false);
-                  router.push("/");
-                }}
-                className="w-full py-3.5 rounded-xl font-bold text-slate-300 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-              >
-                Batal (Kembali ke Beranda)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

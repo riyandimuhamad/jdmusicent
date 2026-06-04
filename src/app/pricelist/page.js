@@ -35,7 +35,7 @@ export default function PricelistPage() {
             <Sparkles className="w-3.5 h-3.5 animate-pulse" />
             <span>Pricelist & Paket</span>
           </div>
-          <h1 className="font-heading font-extrabold text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+          <h1 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight leading-tight">
             Pilihan Paket Hiburan <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-gold via-gold-champagne to-electric bg-clip-text text-transparent text-glow-gold">
               Musik Pernikahan

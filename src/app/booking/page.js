@@ -151,7 +151,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
             <Calendar className="w-3.5 h-3.5" />
             <span>Form Booking Online</span>
           </div>
-          <h1 className="font-heading font-extrabold text-3xl sm:text-5xl text-white tracking-tight">
+          <h1 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight">
             Amankan Tanggal <br />
             <span className="bg-gradient-to-r from-gold via-gold-champagne to-electric bg-clip-text text-transparent text-glow-gold">
               Acara Anda
