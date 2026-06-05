@@ -8,6 +8,12 @@ import packagesData from "@/data/packages.json";
 import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
 
+const getThemeTier = (price) => {
+  if (price >= 350000) return 'Luxury';
+  if (price >= 250000) return 'Eksklusif';
+  return 'Premium';
+};
+
 function BookingFormContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -315,15 +321,21 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                         className="w-4.5 h-4.5 rounded border-white/20 accent-gold"
                       />
                       <div className="flex-grow select-none">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs sm:text-sm font-bold text-white flex items-center space-x-1">
-                            <span>Tambahkan Undangan Digital</span>
-                            <span className="text-[9px] font-extrabold uppercase bg-gold/15 text-gold px-1.5 py-0.5 rounded tracking-wider">Bundling Promo</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-xs sm:text-sm font-bold text-white">Tambahkan Undangan Digital</span>
+                            <span className="text-[9px] font-extrabold uppercase bg-gold/15 text-gold px-1.5 py-0.5 rounded tracking-wider whitespace-nowrap">Bundling Promo</span>
+                          </div>
+                          <span className="text-xs font-bold text-gold whitespace-nowrap">
+                            {isAddonChecked ? `+ ${formatIDR(selectedTheme.priceAddon)}` : "Mulai dari + Rp 105.000"}
                           </span>
-                          <span className="text-xs font-bold text-gold">+ {formatIDR(150000)}</span>
                         </div>
                         <p className="text-xs text-slate-400 mt-1 leading-normal">
-                          Bundling undangan digital hemat s.d Rp 150.000 dibanding membeli standalone undangan.
+                          {isAddonChecked ? (
+                            <>Dapatkan Harga Spesial Bundling. Anda berhemat <span className="text-white font-semibold">{formatIDR(selectedTheme.priceStandalone - selectedTheme.priceAddon)}</span> untuk tema <span className="text-gold font-semibold">{selectedTheme.name}</span>.</>
+                          ) : (
+                            "Centang untuk memilih desain. Dapatkan harga spesial khusus pemesanan beserta paket musik."
+                          )}
                         </p>
                       </div>
                     </label>
@@ -334,7 +346,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                         <div className="flex flex-col space-y-3">
                           <label className="text-xs sm:text-sm font-semibold text-slate-300">Pilih Desain Tema Undangan</label>
                           <div className="flex flex-wrap gap-2">
-                            {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => (
+                            {["Semua", "Premium", "Eksklusif", "Luxury"].map((cat) => (
                               <button
                                 key={cat}
                                 type="button"
@@ -352,7 +364,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                           </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                          {themesData.filter(theme => activeThemeCategory === "Semua" || theme.category === activeThemeCategory).map((theme) => (
+                          {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => (
                             <div
                               key={theme.id}
                               onClick={() => setSelectedThemeId(theme.id)}
