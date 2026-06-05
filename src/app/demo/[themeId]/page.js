@@ -1,18 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import themesData from "@/data/themes.json";
 import { 
   MapPin, Calendar, Clock, Heart, Music, ChevronDown, User, Gift, 
-  CreditCard, Send, Camera, Home, Users, Image as ImageIcon, Copy, CheckCircle
+  CreditCard, Send, Camera, Home, Users, Image as ImageIcon, Copy, CheckCircle, Quote
 } from "lucide-react";
+import { mockDb } from "@/lib/supabase";
 
 export default function ThemeDemoPage() {
   const params = useParams();
   const router = useRouter();
   const themeId = params.themeId;
+  const searchParams = useSearchParams();
+  const guestNameParam = searchParams.get("to") || "Tamu Kehormatan";
   
   const [theme, setTheme] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +23,11 @@ export default function ThemeDemoPage() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const audioRef = useRef(null);
+
+  // RSVP States
+  const [rsvpForm, setRsvpForm] = useState({ name: guestNameParam !== "Tamu Kehormatan" ? guestNameParam.replace(/-/g, ' ') : "", status: "", message: "" });
+  const [wishes, setWishes] = useState([]);
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
 
   // Live Countdown State (Including Seconds!)
   const [timeLeft, setTimeLeft] = useState({
@@ -29,6 +37,9 @@ export default function ThemeDemoPage() {
   useEffect(() => {
     const foundTheme = themesData.find((t) => t.id === themeId);
     if (foundTheme) setTheme(foundTheme);
+
+    // Load Wishes
+    mockDb.getGuests().then(data => setWishes(data));
 
     // Ticking Timer Logic
     const timer = setInterval(() => {
@@ -80,6 +91,20 @@ export default function ThemeDemoPage() {
     setTimeout(() => setCopied(false), 3000);
   };
 
+  const handleRsvpSubmit = async (e) => {
+    e.preventDefault();
+    if (!rsvpForm.name || !rsvpForm.status || !rsvpForm.message) {
+      alert("Mohon lengkapi semua field!");
+      return;
+    }
+    setIsSubmittingRsvp(true);
+    await mockDb.addGuest(rsvpForm);
+    const updatedWishes = await mockDb.getGuests();
+    setWishes(updatedWishes);
+    setRsvpForm({ name: "", status: "", message: "" });
+    setIsSubmittingRsvp(false);
+  };
+
   if (!theme) return <div className="min-h-screen bg-navy-dark flex flex-col items-center justify-center text-white"><div className="w-8 h-8 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4" /><p className="animate-pulse text-xs tracking-widest font-bold">MENGHUBUNGKAN TEMA...</p></div>;
 
   // --- V2 COLOR MAPPING STRATEGY ---
@@ -108,6 +133,14 @@ export default function ThemeDemoPage() {
         .theme-bg-accent { background-color: var(--color-accent); }
         .theme-text-accent { color: var(--color-accent); }
         .theme-border-accent { border-color: var(--color-accent); }
+
+        .custom-scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .custom-scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
 
       {/* --- COVER SCREEN (SLIDE UP) --- */}
@@ -138,7 +171,7 @@ export default function ThemeDemoPage() {
               
               <div className="p-4 px-8 border-b border-[var(--color-accent)] mb-16 w-full relative">
                 <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 theme-bg-accent" />
-                <p className="theme-text font-bold text-xl tracking-wider">Tamu Kehormatan</p>
+                <p className="theme-text font-bold text-xl tracking-wider">{guestNameParam.replace(/-/g, ' ')}</p>
               </div>
 
               <motion.button 
@@ -188,6 +221,21 @@ export default function ThemeDemoPage() {
               <ChevronDown className="w-6 h-6 theme-text-accent" />
             </motion.div>
           </motion.div>
+        </section>
+
+        {/* Dedicated Quotes Section */}
+        <section id="quotes" className="py-24 px-8 text-center relative border-t border-[var(--color-text)]/5 flex flex-col items-center justify-center min-h-[50vh]">
+          <Quote className="w-12 h-12 theme-text-accent opacity-20 absolute top-10 left-10" />
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative z-10">
+            <h3 className="font-heading text-4xl theme-text mb-8">Ayat Suci & Kutipan</h3>
+            <p className="theme-text text-sm sm:text-base leading-relaxed max-w-[320px] mx-auto italic font-serif">
+              "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang."
+            </p>
+            <p className="theme-text-accent mt-6 font-bold tracking-widest text-xs uppercase">
+              (QS. Ar-Rum: 21)
+            </p>
+          </motion.div>
+          <Quote className="w-12 h-12 theme-text-accent opacity-20 absolute bottom-10 right-10 rotate-180" />
         </section>
 
         {/* Live Countdown Section (Including SECONDS) */}
@@ -291,7 +339,7 @@ export default function ThemeDemoPage() {
         </section>
 
         {/* Digital Envelope (Amplop Digital) */}
-        <section className="py-24 px-6 relative border-t border-[var(--color-text)]/5">
+        <section id="gift" className="py-24 px-6 relative border-t border-[var(--color-text)]/5">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
             <h3 className="font-heading text-4xl theme-text mb-3">Tanda Kasih</h3>
             <p className="theme-text text-sm opacity-75">Bagi keluarga & sahabat yang ingin memberikan hadiah</p>
@@ -334,26 +382,62 @@ export default function ThemeDemoPage() {
             <p className="theme-text text-sm opacity-75">Kehadiran & Buku Tamu</p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="theme-bg-surface p-8 rounded-[2.5rem] shadow-xl border border-[var(--color-text)]/10">
-            <form className="space-y-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="theme-bg-surface p-8 rounded-[2.5rem] shadow-xl border border-[var(--color-text)]/10 mb-12">
+            <form onSubmit={handleRsvpSubmit} className="space-y-6">
               <div>
-                <input type="text" placeholder="Nama Lengkap" className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)]" />
+                <input 
+                  type="text" 
+                  value={rsvpForm.name}
+                  onChange={(e) => setRsvpForm(prev => ({...prev, name: e.target.value}))}
+                  placeholder="Nama Lengkap" 
+                  className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)]" 
+                />
               </div>
               <div>
-                <select className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)] appearance-none">
+                <select 
+                  value={rsvpForm.status}
+                  onChange={(e) => setRsvpForm(prev => ({...prev, status: e.target.value}))}
+                  className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)] appearance-none"
+                >
                   <option value="">Konfirmasi Kehadiran</option>
                   <option value="hadir">Hadir</option>
                   <option value="tidak">Tidak Hadir</option>
                 </select>
               </div>
               <div>
-                <textarea rows="4" placeholder="Tuliskan ucapan dan doa restu..." className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)] resize-none" />
+                <textarea 
+                  rows="4" 
+                  value={rsvpForm.message}
+                  onChange={(e) => setRsvpForm(prev => ({...prev, message: e.target.value}))}
+                  placeholder="Tuliskan ucapan dan doa restu..." 
+                  className="w-full px-6 py-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-accent)]/20 theme-text text-sm focus:outline-none focus:border-[var(--color-accent)] resize-none" 
+                />
               </div>
-              <button type="button" className="w-full py-4 rounded-2xl theme-bg-accent text-[var(--color-bg)] font-bold tracking-widest uppercase text-xs hover:opacity-90 flex items-center justify-center space-x-2">
+              <button 
+                type="submit" 
+                disabled={isSubmittingRsvp}
+                className="w-full py-4 rounded-2xl theme-bg-accent text-[var(--color-bg)] font-bold tracking-widest uppercase text-xs hover:opacity-90 flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
                 <Send className="w-4 h-4" />
-                <span>Kirim Ucapan</span>
+                <span>{isSubmittingRsvp ? "Mengirim..." : "Kirim Ucapan"}</span>
               </button>
             </form>
+          </motion.div>
+
+          {/* Wishes List */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {wishes.map((wish) => (
+              <div key={wish.id} className="theme-bg-surface p-6 rounded-2xl border border-[var(--color-text)]/5 shadow-sm text-left">
+                <div className="flex items-start justify-between mb-2">
+                  <h5 className="font-bold theme-text text-sm">{wish.name}</h5>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${wish.status === 'hadir' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                    {wish.status === 'hadir' ? 'Hadir' : 'Tidak Hadir'}
+                  </span>
+                </div>
+                <p className="text-xs theme-text opacity-80 mb-2 leading-relaxed">{wish.message}</p>
+                <span className="text-[9px] theme-text opacity-40">{new Date(wish.created_at).toLocaleString('id-ID')}</span>
+              </div>
+            ))}
           </motion.div>
         </section>
 
@@ -377,25 +461,40 @@ export default function ThemeDemoPage() {
         {/* Floating Bottom Navigation Tab Bar */}
         <motion.div 
           initial={{ y: 100 }} animate={{ y: isOpen ? 0 : 100 }} transition={{ delay: 1 }}
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[var(--color-surface)]/90 backdrop-blur-md px-6 py-3 rounded-full border border-[var(--color-text)]/10 shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex items-center space-x-6"
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[var(--color-surface)]/95 backdrop-blur-md px-2 py-2 rounded-full border border-[var(--color-text)]/10 shadow-[0_10px_40px_rgba(0,0,0,0.15)] w-[90%] max-w-[400px] overflow-hidden"
         >
-          <a href="#home" onClick={() => setActiveTab('home')} className={`flex flex-col items-center p-2 transition-colors ${activeTab === 'home' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
-            <Home className="w-5 h-5 mb-1" />
-            <span className="text-[8px] uppercase tracking-widest font-bold">Home</span>
-          </a>
-          <a href="#couple" onClick={() => setActiveTab('couple')} className={`flex flex-col items-center p-2 transition-colors ${activeTab === 'couple' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
-            <Users className="w-5 h-5 mb-1" />
-            <span className="text-[8px] uppercase tracking-widest font-bold">Couple</span>
-          </a>
-          <a href="#event" onClick={() => setActiveTab('event')} className={`flex flex-col items-center p-2 transition-colors ${activeTab === 'event' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
-            <Calendar className="w-5 h-5 mb-1" />
-            <span className="text-[8px] uppercase tracking-widest font-bold">Event</span>
-          </a>
-          <a href="#gallery" onClick={() => setActiveTab('gallery')} className={`flex flex-col items-center p-2 transition-colors ${activeTab === 'gallery' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
-            <ImageIcon className="w-5 h-5 mb-1" />
-            <span className="text-[8px] uppercase tracking-widest font-bold">Gallery</span>
-          </a>
+          <div className="flex items-center space-x-2 overflow-x-auto custom-scrollbar-hide px-2">
+            <a href="#home" onClick={() => setActiveTab('home')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'home' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Home className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Home</span>
+            </a>
+            <a href="#quotes" onClick={() => setActiveTab('quotes')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'quotes' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Quote className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Quotes</span>
+            </a>
+            <a href="#couple" onClick={() => setActiveTab('couple')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'couple' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Users className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Couple</span>
+            </a>
+            <a href="#event" onClick={() => setActiveTab('event')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'event' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Calendar className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Event</span>
+            </a>
+            <a href="#gallery" onClick={() => setActiveTab('gallery')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'gallery' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <ImageIcon className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Gallery</span>
+            </a>
+            <a href="#gift" onClick={() => setActiveTab('gift')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'gift' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Gift className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">Gift</span>
+            </a>
+            <a href="#rsvp" onClick={() => setActiveTab('rsvp')} className={`flex-shrink-0 flex flex-col items-center p-2 min-w-[56px] transition-colors ${activeTab === 'rsvp' ? 'theme-text-accent scale-110' : 'theme-text opacity-50 hover:opacity-100'}`}>
+              <Send className="w-5 h-5 mb-1" />
+              <span className="text-[8px] uppercase tracking-widest font-bold">RSVP</span>
+            </a>
+          </div>
         </motion.div>
+
 
       </main>
     </div>

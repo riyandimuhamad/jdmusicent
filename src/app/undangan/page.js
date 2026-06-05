@@ -9,7 +9,7 @@ import { formatIDR, cn } from "@/lib/utils";
 
 export default function UndanganPage() {
   const router = useRouter();
-  
+
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [activeTier, setActiveTier] = useState("Semua");
   const [previewThemeId, setPreviewThemeId] = useState(null);
@@ -38,7 +38,7 @@ export default function UndanganPage() {
   };
 
   const getThemeTitleColor = (id) => {
-    switch(id) {
+    switch (id) {
       // LOKAL
       case "lokal-sunda-priangan": return "#A7F3D0"; // Sage Green Light
       case "lokal-sunda-cirebonan": return "#FCA5A5"; // Megamendung Red accent
@@ -56,7 +56,7 @@ export default function UndanganPage() {
       case "lokal-maluku-mutiara": return "#7DD3FC"; // Ocean Blue
       case "lokal-ntt-tenun": return "#FB7185"; // Sunset Rose/Orange
       case "lokal-papua-asmat": return "#F59E0B"; // Earthy Amber
-      
+
       // NASIONAL
       case "nasional-modern-minimalist": return "#F3F4F6"; // White/Gray
       case "nasional-rustic-warmth": return "#FDE047"; // Warm Sand
@@ -70,7 +70,7 @@ export default function UndanganPage() {
       case "nasional-rose-gold": return "#FDA4AF"; // Rose Gold
       case "nasional-classic-marble": return "#E2E8F0"; // Marble Gray
       case "nasional-champagne": return "#FDE047"; // Champagne
-      
+
       // INTERNASIONAL
       case "int-victorian-classic": return "#FBCFE8"; // Victorian Pink
       case "int-oriental-mandarin": return "#FCA5A5"; // Mandarin Red
@@ -84,7 +84,7 @@ export default function UndanganPage() {
       case "int-korean-pastel": return "#FED7AA"; // Peach
       case "int-autumn-new-york": return "#FB923C"; // Autumn Orange
       case "int-tuscan-vineyard": return "#A3E635"; // Olive Green
-      
+
       default: return "#D4AF37"; // Default Gold
     }
   };
@@ -92,168 +92,168 @@ export default function UndanganPage() {
   return (
     <>
       <div className="min-h-screen pt-28 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
-      
-      {/* Background Radial Glow */}
-      <div className="absolute top-[10%] right-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
 
-      <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-        
-        {/* Page Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center space-x-1 text-gold text-xs font-semibold tracking-[0.2em] uppercase">
-            <Heart className="w-3.5 h-3.5 text-gold animate-pulse" />
-            <span>Undangan Digital Standalone</span>
+        {/* Background Radial Glow */}
+        <div className="absolute top-[10%] right-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
+
+        <div className="max-w-7xl mx-auto space-y-12 relative z-10">
+
+          {/* Page Header */}
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <div className="inline-flex items-center space-x-1 text-gold text-xs font-semibold tracking-[0.2em] uppercase">
+              <Heart className="w-3.5 h-3.5 text-gold animate-pulse" />
+              <span>Undangan Digital Standalone</span>
+            </div>
+            <h1 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight">
+              Desain Undangan Digital <br />
+              <span className="bg-gradient-to-r from-gold via-gold-champagne to-electric bg-clip-text text-transparent text-glow-gold">
+                Eksklusif & Mewah
+              </span>
+            </h1>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+              Pilih tema undangan digital berkelas untuk membagikan kebahagiaan Anda secara instan kepada keluarga dan sahabat dekat. Dilengkapi musik latar romantis, galeri foto, RSVP, dan peta navigasi terintegrasi.
+            </p>
           </div>
-          <h1 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight">
-            Desain Undangan Digital <br />
-            <span className="bg-gradient-to-r from-gold via-gold-champagne to-electric bg-clip-text text-transparent text-glow-gold">
-              Eksklusif & Mewah
-            </span>
-          </h1>
-          <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
-            Pilih tema undangan digital berkelas untuk membagikan kebahagiaan Anda secara instan kepada keluarga dan sahabat dekat. Dilengkapi musik latar romantis, galeri foto, RSVP, dan peta navigasi terintegrasi.
-          </p>
-        </div>
 
-        {/* Categories Tab Navigation */}
-        <div className="flex flex-col items-center space-y-4 pt-4">
-          {/* Baris 1: Filter Budaya (INDUK - Statis) */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => {
-              // Menghitung total absolut di database (Statis)
-              const count = cat === "Semua" ? themesData.length : themesData.filter(t => t.category === cat).length;
-              const displayCat = cat === "Semua" ? "Semua" : categoryMap[cat];
-              
+          {/* Categories Tab Navigation */}
+          <div className="flex flex-col items-center space-y-4 pt-4">
+            {/* Baris 1: Filter Budaya (INDUK - Statis) */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {["Semua", "Lokal", "Nasional", "Internasional"].map((cat) => {
+                // Menghitung total absolut di database (Statis)
+                const count = cat === "Semua" ? themesData.length : themesData.filter(t => t.category === cat).length;
+                const displayCat = cat === "Semua" ? "Semua" : categoryMap[cat];
+
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
+                      activeCategory === cat
+                        ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                    )}
+                  >
+                    <span>{displayCat}</span>
+                    <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeCategory === cat ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Baris 2: Filter Kasta (ANAK - Dinamis terhadap Budaya) */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+              {["Semua", "Premium", "Eksklusif", "Luxury"].map((tier) => {
+                // Menghitung distribusi kasta berdasarkan Budaya yang sedang aktif
+                const count = themesData.filter(t =>
+                  (activeCategory === "Semua" || t.category === activeCategory) &&
+                  (tier === "Semua" || getThemeTier(t.priceStandalone) === tier)
+                ).length;
+
+                return (
+                  <button
+                    key={tier}
+                    onClick={() => setActiveTier(tier)}
+                    className={cn(
+                      "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
+                      activeTier === tier
+                        ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                        : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
+                    )}
+                  >
+                    <span>{tier}</span>
+                    <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeTier === tier ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Theme List Selection Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 pt-4">
+            {themesData.filter(theme => {
+              const matchCategory = activeCategory === "Semua" || theme.category === activeCategory;
+              const matchTier = activeTier === "Semua" || getThemeTier(theme.priceStandalone) === activeTier;
+              return matchCategory && matchTier;
+            }).map((theme) => {
               return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
-                    activeCategory === cat
-                      ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                  )}
+                <div
+                  key={theme.id}
+                  className="group relative flex flex-col rounded-2xl overflow-hidden bg-navy-darker/50 border border-white/5 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-gold/30"
                 >
-                  <span>{displayCat}</span>
-                  <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeCategory === cat ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Baris 2: Filter Kasta (ANAK - Dinamis terhadap Budaya) */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-            {["Semua", "Premium", "Eksklusif", "Luxury"].map((tier) => {
-              // Menghitung distribusi kasta berdasarkan Budaya yang sedang aktif
-              const count = themesData.filter(t => 
-                (activeCategory === "Semua" || t.category === activeCategory) && 
-                (tier === "Semua" || getThemeTier(t.priceStandalone) === tier)
-              ).length;
-              
-              return (
-                <button
-                  key={tier}
-                  onClick={() => setActiveTier(tier)}
-                  className={cn(
-                    "px-4 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold tracking-wide transition-all duration-300 flex items-center space-x-1.5 border",
-                    activeTier === tier
-                      ? "bg-gradient-to-r from-gold to-yellow-500 text-navy-dark border-transparent shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-                      : "bg-white/5 border-white/10 text-slate-300 hover:bg-white/10"
-                  )}
-                >
-                  <span>{tier}</span>
-                  <span className={cn("px-2 py-0.5 rounded-xl text-[10px]", activeTier === tier ? "bg-navy-dark/20 text-navy-dark" : "bg-white/10 text-slate-400")}>{count}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Theme List Selection Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 pt-4">
-          {themesData.filter(theme => {
-            const matchCategory = activeCategory === "Semua" || theme.category === activeCategory;
-            const matchTier = activeTier === "Semua" || getThemeTier(theme.priceStandalone) === activeTier;
-            return matchCategory && matchTier;
-          }).map((theme) => {
-            return (
-              <div
-                key={theme.id}
-                className="group relative flex flex-col rounded-2xl overflow-hidden bg-navy-darker/50 border border-white/5 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-gold/30"
-              >
-                {/* Diagonal Ribbon Badge (Top Left Slanted) */}
-                {activeTier === "Semua" && (
-                  <div className="absolute top-5 -left-10 w-40 -rotate-45 z-30 pointer-events-none">
-                    <div className={cn(
-                      "w-full text-center py-1.5 shadow-lg text-[9px] font-black uppercase tracking-widest",
-                      getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]" :
-                      getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]" :
-                      "bg-emerald-600 text-white shadow-[0_0_15px_rgba(5,150,105,0.4)]"
-                    )}>
-                      {getThemeTier(theme.priceStandalone)}
+                  {/* Diagonal Ribbon Badge (Top Left Slanted) */}
+                  {activeTier === "Semua" && (
+                    <div className="absolute top-5 -left-10 w-40 -rotate-45 z-30 pointer-events-none">
+                      <div className={cn(
+                        "w-full text-center py-1.5 shadow-lg text-[9px] font-black uppercase tracking-widest",
+                        getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]" :
+                          getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]" :
+                            "bg-emerald-600 text-white shadow-[0_0_15px_rgba(5,150,105,0.4)]"
+                      )}>
+                        {getThemeTier(theme.priceStandalone)}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Image Cover (Mockup Style in Dark Mode) */}
-                <div 
-                  className="relative w-full aspect-[4/5] flex items-center justify-center px-6 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent cursor-pointer group/img"
-                  onClick={() => setPreviewThemeId(theme.id)}
-                >
-                  <div className="relative w-full h-full bg-navy-dark rounded-xl shadow-xl overflow-hidden border border-white/10 group-hover/img:border-gold/50 transition-colors duration-500">
-                    <Image 
-                      src={theme.previewUrl || "/logo-3d.png"} 
-                      alt={theme.name} 
-                      fill 
-                      className="object-cover"
-                    />
-                    
-                    {/* Hover Play Button Overlay (HANYA DI DALAM GAMBAR) */}
-                    <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <div className="w-12 h-12 bg-gold/90 backdrop-blur-sm rounded-full flex items-center justify-center pl-1 shadow-[0_0_30px_rgba(212,175,55,0.4)]">
-                        <svg className="w-5 h-5 text-navy-dark" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z" /></svg>
+                  {/* Image Cover (Mockup Style in Dark Mode) */}
+                  <div
+                    className="relative w-full aspect-[4/5] flex items-center justify-center px-6 pt-8 pb-4 bg-gradient-to-b from-white/5 to-transparent cursor-pointer group/img"
+                    onClick={() => setPreviewThemeId(theme.id)}
+                  >
+                    <div className="relative w-full h-full bg-navy-dark rounded-xl shadow-xl overflow-hidden border border-white/10 group-hover/img:border-gold/50 transition-colors duration-500">
+                      <Image
+                        src={theme.previewUrl || "/logo-3d.png"}
+                        alt={theme.name}
+                        fill
+                        className="object-cover"
+                      />
+
+                      {/* Hover Play Button Overlay (HANYA DI DALAM GAMBAR) */}
+                      <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gold/90 backdrop-blur-sm rounded-full flex items-center justify-center pl-1 shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+                          <svg className="w-5 h-5 text-navy-dark" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z" /></svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Info & Title Section (Centered Below Image) */}
-                <div className="w-full flex items-center justify-center px-4 pt-2 pb-5 bg-transparent relative z-20">
-                  <h4 
-                    className="font-heading font-extrabold text-sm sm:text-base uppercase tracking-widest truncate text-center w-full drop-shadow-md"
-                    style={{ color: getThemeTitleColor(theme.id) }}
-                  >
-                    {theme.name}
-                  </h4>
-                </div>
+                  {/* Info & Title Section (Centered Below Image) */}
+                  <div className="w-full flex items-center justify-center px-4 pt-2 pb-5 bg-transparent relative z-20">
+                    <h4
+                      className="font-heading font-extrabold text-sm sm:text-base uppercase tracking-widest truncate text-center w-full drop-shadow-md"
+                      style={{ color: getThemeTitleColor(theme.id) }}
+                    >
+                      {theme.name}
+                    </h4>
+                  </div>
 
-                {/* Split Buttons Container */}
-                <div className="flex bg-navy-darker relative z-10 border-t border-white/10">
-                  <button
-                    onClick={() => setPreviewThemeId(theme.id)}
-                    className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    <Eye className="w-4 h-4" />
-                    <span>Preview</span>
-                  </button>
-                  <div className="w-px bg-white/10" />
-                  <button
-                    onClick={() => router.push(`/undangan/booking?themeId=${theme.id}`)}
-                    className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-bold text-gold hover:bg-gold/10 transition-colors"
-                  >
-                    <CheckCircle className="w-4 h-4" />
-                    <span>Pilih</span>
-                  </button>
+                  {/* Split Buttons Container */}
+                  <div className="flex bg-navy-darker relative z-10 border-t border-white/10">
+                    <button
+                      onClick={() => setPreviewThemeId(theme.id)}
+                      className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>Preview</span>
+                    </button>
+                    <div className="w-px bg-white/10" />
+                    <button
+                      onClick={() => router.push(`/undangan/booking?themeId=${theme.id}`)}
+                      className="flex-1 py-4 flex items-center justify-center space-x-1.5 text-xs font-bold text-gold hover:bg-gold/10 transition-colors"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Pilih</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+
+
         </div>
-
-
-
-      </div>
 
       </div>
 
@@ -274,10 +274,10 @@ export default function UndanganPage() {
               {(() => {
                 const pTheme = themesData.find(t => t.id === previewThemeId);
                 return (
-                  <Image 
-                    src={pTheme?.previewUrl || "/logo-3d.png"} 
-                    alt={pTheme?.name || "Preview"} 
-                    fill 
+                  <Image
+                    src={pTheme?.previewUrl || "/logo-3d.png"}
+                    alt={pTheme?.name || "Preview"}
+                    fill
                     className="object-cover"
                   />
                 );
@@ -289,7 +289,7 @@ export default function UndanganPage() {
               {(() => {
                 const pTheme = themesData.find(t => t.id === previewThemeId);
                 if (!pTheme) return null;
-                
+
                 return (
                   <>
                     <div className="space-y-6">
@@ -351,7 +351,7 @@ export default function UndanganPage() {
                         onClick={() => window.open(`/demo/${pTheme.id}`, '_blank')}
                         className="w-full mt-3 flex items-center justify-center space-x-2 py-3 rounded-xl border border-white/20 text-xs font-semibold text-slate-300 hover:bg-white/10 transition-colors"
                       >
-                        <span>Lihat Demo Lengkap (Sistem Tema)</span>
+                        <span>Pratinjau Live Demo</span>
                       </button>
                     </div>
                   </>
