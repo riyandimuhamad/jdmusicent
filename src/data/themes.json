@@ -20,8 +20,9 @@
     "category": "Lokal",
     "name": "Pusaka Cirebonan",
     "description": "Estetika keraton pesisir utara yang mewah. Menonjolkan corak batik Megamendung berwarna biru pekat dengan aksen merah hati dan emas.",
-    "priceAddon": 105000,
-    "priceStandalone": 115000,
+    "priceAddon": 120000,
+    "priceStandalone": 140000,
+    "coverStyle": "arch",
     "colors": [
       "#102A43",
       "#8B0000",
@@ -36,15 +37,16 @@
     "category": "Lokal",
     "name": "Banten Majesty",
     "description": "Menggambarkan ketegasan dan kesakralan budaya Banten. Perpaduan kontras antara putih tulang, hitam legam, dan kuning kuningan keraton.",
-    "priceAddon": 105000,
-    "priceStandalone": 115000,
+    "priceAddon": 160000,
+    "priceStandalone": 180000,
+    "coverStyle": "envelope",
     "colors": [
       "#FDF5E6",
       "#111111",
       "#FFD700",
       "#808080"
     ],
-    "vibe": "Sacred, Strong, Cultural, Contrast",
+    "vibe": "Sacred, Contrast, Majestic, Minimal",
     "previewUrl": "/assets/templates/sunda-banten-preview.jpg"
   },
   {
@@ -77,7 +79,8 @@
       "#FFF8E1"
     ],
     "vibe": "Traditional, Elegant, Cultural, Golden",
-    "previewUrl": "/assets/templates/javanese-preview.jpg"
+    "previewUrl": "/assets/templates/javanese-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "lokal-jawa-keraton",
@@ -93,7 +96,8 @@
       "#3E2723"
     ],
     "vibe": "Royal, Solo, Sidomukti, Sacred",
-    "previewUrl": "/assets/templates/jawa-keraton-preview.jpg"
+    "previewUrl": "/assets/templates/jawa-keraton-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "lokal-balinese-agung",
@@ -109,7 +113,8 @@
       "#F5F5DC"
     ],
     "vibe": "Majestic, Golden, Tropical, Bali",
-    "previewUrl": "/assets/templates/balinese-preview.jpg"
+    "previewUrl": "/assets/templates/balinese-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "lokal-minang-gadang",
@@ -125,7 +130,8 @@
       "#FFDAB9"
     ],
     "vibe": "Bold, Maroon, Gold, Heritage",
-    "previewUrl": "/assets/templates/minang-preview.jpg"
+    "previewUrl": "/assets/templates/minang-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "lokal-batak-ulos",
@@ -141,7 +147,8 @@
       "#F5F5F5"
     ],
     "vibe": "Bold, Aesthetic, Woven, Heritage",
-    "previewUrl": "/assets/templates/batak-preview.jpg"
+    "previewUrl": "/assets/templates/batak-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "lokal-bugis-mappacci",
@@ -157,7 +164,8 @@
       "#F0FFF0"
     ],
     "vibe": "Emerald, Noble, Gold, Royal",
-    "previewUrl": "/assets/templates/bugis-preview.jpg"
+    "previewUrl": "/assets/templates/bugis-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-dayak-borneo",
@@ -173,7 +181,8 @@
       "#333333"
     ],
     "vibe": "Tribal, Modern, Bold, Geometric",
-    "previewUrl": "/assets/templates/dayak-preview.jpg"
+    "previewUrl": "/assets/templates/dayak-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-palembang-sriwijaya",
@@ -189,7 +198,8 @@
       "#FFF5EE"
     ],
     "vibe": "Royal, Luxurious, Songket, Heritage",
-    "previewUrl": "/assets/templates/palembang-preview.jpg"
+    "previewUrl": "/assets/templates/palembang-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-betawi-pesisir",
@@ -205,7 +215,8 @@
       "#FF69B4"
     ],
     "vibe": "Cheerful, Pastel, Floral, Urban Culture",
-    "previewUrl": "/assets/templates/betawi-preview.jpg"
+    "previewUrl": "/assets/templates/betawi-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-maluku-mutiara",
@@ -221,7 +232,8 @@
       "#4682B4"
     ],
     "vibe": "Oceanic, Pearl, Deep Blue, Eastern",
-    "previewUrl": "/assets/templates/maluku-preview.jpg"
+    "previewUrl": "/assets/templates/maluku-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-ntt-tenun",
@@ -237,7 +249,8 @@
       "#FFF8DC"
     ],
     "vibe": "Warm, Earthy, Woven, Sunset",
-    "previewUrl": "/assets/templates/ntt-preview.jpg"
+    "previewUrl": "/assets/templates/ntt-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "lokal-papua-asmat",
@@ -253,7 +266,8 @@
       "#F5DEB3"
     ],
     "vibe": "Contemporary, Matte, Sculptural, Tribal",
-    "previewUrl": "/assets/templates/papua-preview.jpg"
+    "previewUrl": "/assets/templates/papua-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "nasional-modern-minimalist",
@@ -333,7 +347,8 @@
       "#E2E8F0"
     ],
     "vibe": "Luxury, Elegant, Royal, Premium",
-    "previewUrl": "/assets/templates/navy-gold-preview.jpg"
+    "previewUrl": "/assets/templates/navy-gold-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-emerald-botanical",
@@ -349,7 +364,8 @@
       "#F9FAFB"
     ],
     "vibe": "Fresh, Exotic, Premium, Botanical",
-    "previewUrl": "/assets/templates/emerald-preview.jpg"
+    "previewUrl": "/assets/templates/emerald-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-terracotta-sunset",
@@ -365,7 +381,8 @@
       "#8B4513"
     ],
     "vibe": "Bohemian, Sunset, Earthy, Outdoor",
-    "previewUrl": "/assets/templates/terracotta-preview.jpg"
+    "previewUrl": "/assets/templates/terracotta-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-sapphire-starlight",
@@ -381,7 +398,8 @@
       "#E2E8F0"
     ],
     "vibe": "Magical, Night, Silver, Starry",
-    "previewUrl": "/assets/templates/sapphire-preview.jpg"
+    "previewUrl": "/assets/templates/sapphire-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-ivory-pearl",
@@ -397,7 +415,8 @@
       "#D3D3D3"
     ],
     "vibe": "Pure, Sacred, Pearl, Elegant",
-    "previewUrl": "/assets/templates/ivory-preview.jpg"
+    "previewUrl": "/assets/templates/ivory-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-rose-gold",
@@ -413,7 +432,8 @@
       "#E0BFB8"
     ],
     "vibe": "Glamour, Metallic, Rose Gold, Modern",
-    "previewUrl": "/assets/templates/rosegold-preview.jpg"
+    "previewUrl": "/assets/templates/rosegold-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "nasional-classic-marble",
@@ -429,7 +449,8 @@
       "#102A43"
     ],
     "vibe": "Marble, Ballroom, Luxurious, Hotel",
-    "previewUrl": "/assets/templates/marble-preview.jpg"
+    "previewUrl": "/assets/templates/marble-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "nasional-champagne",
@@ -445,7 +466,8 @@
       "#C2B280"
     ],
     "vibe": "Champagne, Sparkle, Prestige, Joy",
-    "previewUrl": "/assets/templates/champagne-preview.jpg"
+    "previewUrl": "/assets/templates/champagne-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-victorian-classic",
@@ -461,7 +483,8 @@
       "#8B0000"
     ],
     "vibe": "Classic, Romantic, Retro, European",
-    "previewUrl": "/assets/templates/vintage-preview.jpg"
+    "previewUrl": "/assets/templates/vintage-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-oriental-mandarin",
@@ -477,7 +500,8 @@
       "#FFFAF0"
     ],
     "vibe": "Oriental, Lucky, Golden, Empire",
-    "previewUrl": "/assets/templates/oriental-preview.jpg"
+    "previewUrl": "/assets/templates/oriental-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-mediterranean",
@@ -493,7 +517,8 @@
       "#808000"
     ],
     "vibe": "Santorini, Oceanic, Fresh, Olive",
-    "previewUrl": "/assets/templates/mediterranean-preview.jpg"
+    "previewUrl": "/assets/templates/mediterranean-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "int-hollywood-glam",
@@ -509,7 +534,8 @@
       "#F0E68C"
     ],
     "vibe": "Art Deco, Gatsby, Gatsby, Glamour",
-    "previewUrl": "/assets/templates/hollywood-preview.jpg"
+    "previewUrl": "/assets/templates/hollywood-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-french-chateau",
@@ -525,7 +551,8 @@
       "#A9A9A9"
     ],
     "vibe": "French, Chateau, Dusty Blue, Elegant",
-    "previewUrl": "/assets/templates/french-preview.jpg"
+    "previewUrl": "/assets/templates/french-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-japanese-zen",
@@ -541,7 +568,8 @@
       "#FDF5E6"
     ],
     "vibe": "Zen, Minimalist, Sakura, Peaceful",
-    "previewUrl": "/assets/templates/japanese-preview.jpg"
+    "previewUrl": "/assets/templates/japanese-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "int-boho-moroccan",
@@ -557,7 +585,8 @@
       "#F4A460"
     ],
     "vibe": "Bohemian, Moroccan, Desert, Warm",
-    "previewUrl": "/assets/templates/moroccan-preview.jpg"
+    "previewUrl": "/assets/templates/moroccan-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-scandinavian",
@@ -589,7 +618,8 @@
       "#FF4500"
     ],
     "vibe": "Vibrant, Royal, Festive, Henna",
-    "previewUrl": "/assets/templates/indian-preview.jpg"
+    "previewUrl": "/assets/templates/indian-preview.jpg",
+    "coverStyle": "envelope"
   },
   {
     "id": "int-korean-pastel",
@@ -621,7 +651,8 @@
       "#F5DEB3"
     ],
     "vibe": "Autumn, Romantic, Maple, Cozy",
-    "previewUrl": "/assets/templates/autumn-preview.jpg"
+    "previewUrl": "/assets/templates/autumn-preview.jpg",
+    "coverStyle": "arch"
   },
   {
     "id": "int-tuscan-vineyard",
@@ -637,6 +668,7 @@
       "#F0E68C"
     ],
     "vibe": "Tuscany, Olive, Vineyard, European",
-    "previewUrl": "/assets/templates/tuscan-preview.jpg"
+    "previewUrl": "/assets/templates/tuscan-preview.jpg",
+    "coverStyle": "envelope"
   }
 ]

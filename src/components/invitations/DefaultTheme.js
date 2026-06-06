@@ -9,6 +9,9 @@ import {
   CreditCard, Send, Camera, Home, Users, Image as ImageIcon, Copy, CheckCircle, Quote
 } from "lucide-react";
 import { mockDb } from "@/lib/supabase";
+import EksklusifCover from "./covers/EksklusifCover";
+import LuxuryCover from "./covers/LuxuryCover";
+import { DynamicOrnament } from "./shared/DynamicOrnaments";
 
 export default function DefaultTheme() {
   const params = useParams();
@@ -139,13 +142,49 @@ export default function DefaultTheme() {
       {/* Background layer */}
       <div className="fixed inset-0 z-[-1]" style={{ backgroundColor: 'var(--color-bg)' }} />
       
-      {/* Dynamic CSS Utilities */}
+      {/* Dynamic CSS Utilities for Premium Layout */}
       <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Pinyon+Script&family=Cinzel:wght@400;700&family=Great+Vibes&family=Lora:ital,wght@0,400;0,700;1,400&family=Dancing+Script&display=swap');
+
         .theme-text { color: var(--color-text); }
         .theme-bg-surface { background-color: var(--color-surface); }
         .theme-bg-accent { background-color: var(--color-accent); }
         .theme-text-accent { color: var(--color-accent); }
         .theme-border-accent { border-color: var(--color-accent); }
+
+        .font-heading {
+          font-family: ${theme?.typography?.heading === 'serif' ? "'Playfair Display', serif" : theme?.typography?.heading === 'cinzel' ? "'Cinzel', serif" : "'Lora', serif"};
+        }
+
+        .font-script {
+          font-family: ${theme?.typography?.script === 'cursive' ? "'Pinyon Script', cursive" : theme?.typography?.script === 'greatvibes' ? "'Great Vibes', cursive" : "'Dancing Script', cursive"};
+        }
+
+        .theme-pattern-bg {
+          background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+          background-repeat: repeat;
+          opacity: 0.25;
+          mix-blend-mode: multiply;
+        }
+
+        .premium-frame {
+          position: absolute;
+          inset: 16px;
+          border: 1px solid var(--color-accent);
+          border-radius: 24px;
+          pointer-events: none;
+          z-index: 10;
+          opacity: 0.5;
+        }
+
+        .premium-frame::before {
+          content: '';
+          position: absolute;
+          inset: 6px;
+          border: 1px solid var(--color-accent);
+          border-radius: 18px;
+          opacity: 0.3;
+        }
 
         .custom-scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -156,30 +195,49 @@ export default function DefaultTheme() {
         }
       `}</style>
 
-      {/* --- COVER SCREEN (SLIDE UP) --- */}
+      {/* --- COVER SCREEN --- */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && theme?.coverStyle === 'arch' && (
+          <motion.div key="arch" exit={{ opacity: 0 }} transition={{ duration: 1 }} className="fixed inset-0 z-50">
+            <EksklusifCover theme={theme} guestName={guestNameParam} onOpen={handleOpenInvitation} isCoverOnly={isCoverOnly} />
+          </motion.div>
+        )}
+        
+        {!isOpen && theme?.coverStyle === 'envelope' && (
+          <motion.div key="envelope" exit={{ opacity: 0, scale: 1.1 }} transition={{ duration: 1 }} className="fixed inset-0 z-50">
+            <LuxuryCover theme={theme} guestName={guestNameParam} onOpen={handleOpenInvitation} isCoverOnly={isCoverOnly} />
+          </motion.div>
+        )}
+
+        {!isOpen && !theme?.coverStyle && (
           <motion.div 
             initial={{ y: 0 }}
             exit={{ y: "-100%", transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1] } }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center shadow-2xl" 
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center shadow-2xl overflow-hidden" 
             style={{ backgroundColor: 'var(--color-bg)' }}
           >
-            <div className="absolute top-0 left-0 w-full h-64 opacity-30" style={{ background: `linear-gradient(to bottom, var(--color-accent), transparent)` }} />
+            <div className="absolute inset-0 theme-pattern-bg z-0" />
             
+            {/* Elegant Double Frame */}
+            <div className="premium-frame" />
+            
+            <DynamicOrnament themeId={themeId} type="corner" className="absolute top-4 right-4 w-48 h-48 opacity-80 z-10" />
+            <DynamicOrnament themeId={themeId} type="corner" className="absolute bottom-4 left-4 w-48 h-48 opacity-80 z-10" style={{ transform: 'rotate(180deg)' }} />
+
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, delay: 0.3 }}
               className="z-10 text-center px-6 flex flex-col items-center w-full max-w-sm"
             >
+              <DynamicOrnament themeId={themeId} type="hero" className="w-24 h-12 mb-4" />
               <p className="theme-text text-xs tracking-[0.3em] uppercase mb-1 opacity-80 font-semibold">You Are Invited</p>
               <p className="theme-text text-xs tracking-[0.2em] uppercase mb-6 opacity-80">To The Wedding Of</p>
               
               <div className="flex flex-col items-center justify-center mb-6">
-                <h1 className="font-heading text-6xl sm:text-7xl theme-text drop-shadow-sm leading-none">R</h1>
-                <span className="font-heading text-3xl theme-text-accent my-2">&</span>
-                <h1 className="font-heading text-6xl sm:text-7xl theme-text drop-shadow-sm leading-none">A</h1>
+                <h1 className="font-script text-7xl sm:text-8xl theme-text drop-shadow-sm leading-none">R</h1>
+                <span className="font-heading text-4xl theme-text-accent my-2">&</span>
+                <h1 className="font-script text-7xl sm:text-8xl theme-text drop-shadow-sm leading-none">A</h1>
               </div>
 
               <div className="theme-border-accent border-y py-2 px-8 mb-10">
@@ -214,7 +272,7 @@ export default function DefaultTheme() {
 
       {/* --- INVITATION CONTENT --- */}
       {!isCoverOnly && (
-      <main className="w-full max-w-[480px] mx-auto min-h-screen relative shadow-2xl pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
+      <main className={`w-full max-w-[480px] mx-auto relative shadow-2xl pb-24 transition-all duration-1000 ${!isOpen ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 min-h-screen'}`} style={{ backgroundColor: 'var(--color-bg)' }}>
         
         {/* Hidden Audio */}
         <audio ref={audioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop preload="auto" />
@@ -231,13 +289,22 @@ export default function DefaultTheme() {
 
         {/* Hero Section */}
         <section id="home" className="min-h-[90vh] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]" />
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
           
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative z-10 flex flex-col items-center mt-20">
-            <p className="theme-text text-xs tracking-[0.3em] uppercase mb-4 font-semibold">The Wedding Of</p>
-            <h2 className="font-heading text-7xl sm:text-8xl mb-8 theme-text" style={{ textShadow: '2px 4px 10px rgba(0,0,0,0.1)' }}>R & J</h2>
+          {/* Elegant Double Frame */}
+          <div className="premium-frame" />
+
+          <DynamicOrnament themeId={themeId} type="corner" className="absolute top-4 left-4 w-64 h-64 opacity-80 z-10" style={{ transform: 'scaleX(-1)' }} />
+          <DynamicOrnament themeId={themeId} type="corner" className="absolute bottom-4 right-4 w-64 h-64 opacity-80 z-10" style={{ transform: 'scaleX(-1) rotate(180deg)' }} />
+          
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative z-10 flex flex-col items-center mt-10">
+            <DynamicOrnament themeId={themeId} type="hero" className="w-32 h-16 mb-6" />
+            <p className="theme-text text-[10px] tracking-[0.4em] uppercase mb-4 font-bold opacity-80">The Wedding Of</p>
+            <h2 className="font-script text-8xl sm:text-9xl mb-10 theme-text-accent leading-none" style={{ textShadow: '2px 4px 15px rgba(0,0,0,0.15)' }}>R & J</h2>
             
-            <p className="theme-text text-sm leading-relaxed max-w-[280px] mx-auto mb-16 italic opacity-80">
+            <div className="w-12 h-[1px] theme-bg-accent mb-10 opacity-50" />
+
+            <p className="theme-text text-sm leading-relaxed max-w-[280px] mx-auto mb-16 italic opacity-90 font-serif">
               "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri..."
             </p>
             
@@ -249,8 +316,11 @@ export default function DefaultTheme() {
         </section>
 
         {/* Dedicated Quotes Section */}
-        <section id="quotes" className="py-24 px-8 text-center relative border-t border-[var(--color-text)]/5 flex flex-col items-center justify-center min-h-[50vh]">
-          <Quote className="w-12 h-12 theme-text-accent opacity-20 absolute top-10 left-10" />
+        <section id="quotes" className="py-24 px-8 text-center relative border-t border-[var(--color-text)]/5 flex flex-col items-center justify-center min-h-[50vh] overflow-hidden">
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
+          <div className="premium-frame" />
+          
+          <Quote className="w-12 h-12 theme-text-accent opacity-20 absolute top-10 left-10 z-10" />
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="relative z-10">
             <h3 className="font-heading text-4xl theme-text mb-8">Ayat Suci & Kutipan</h3>
             <p className="theme-text text-sm sm:text-base leading-relaxed max-w-[320px] mx-auto italic font-serif">
@@ -264,8 +334,11 @@ export default function DefaultTheme() {
         </section>
 
         {/* Live Countdown Section (Including SECONDS) */}
-        <section className="py-16 px-6 theme-bg-surface text-center relative shadow-inner">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.5 }} variants={fadeUp}>
+        <section className="py-16 px-6 theme-bg-surface text-center relative shadow-inner overflow-hidden">
+          <div className="absolute inset-0 theme-pattern-bg opacity-50 z-0" />
+          <div className="premium-frame" />
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.5 }} variants={fadeUp} className="relative z-10">
             <h3 className="font-heading text-2xl mb-8 tracking-widest uppercase theme-text-accent">Menuju Hari Bahagia</h3>
             
             <div className="flex items-center justify-center gap-2 sm:gap-4 relative z-10">
@@ -293,16 +366,18 @@ export default function DefaultTheme() {
           </motion.div>
         </section>
 
-        {/* Mempelai Section */}
+        {/* Mempelai Section (Arch Photos) */}
         <section id="couple" className="py-24 px-8 text-center relative border-y-[12px] theme-border-accent overflow-hidden theme-bg-surface">
-          <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="font-heading text-5xl theme-text mb-16">
+          <div className="absolute inset-0 theme-pattern-bg z-0 opacity-40" />
+
+          <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="font-heading text-5xl theme-text mb-16 relative z-10">
             Mempelai
           </motion.h3>
           
           <div className="flex flex-col items-center space-y-16">
             {/* Groom */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeRight} className="flex flex-col items-center">
-              <div className="w-48 h-64 rounded-t-full p-2 mb-6 border-2 theme-border-accent shadow-2xl relative">
+              <div className="w-48 h-64 rounded-t-full p-2 mb-6 border-2 theme-border-accent shadow-2xl relative bg-[var(--color-bg)]">
                 <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop" alt="Groom" className="w-full h-full object-cover rounded-t-full" />
               </div>
               <h4 className="font-heading text-3xl theme-text font-bold mb-2">Romeo Montague</h4>
@@ -313,7 +388,7 @@ export default function DefaultTheme() {
 
             {/* Bride */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeLeft} className="flex flex-col items-center">
-              <div className="w-48 h-64 rounded-t-full p-2 mb-6 border-2 theme-border-accent shadow-2xl relative">
+              <div className="w-48 h-64 rounded-t-full p-2 mb-6 border-2 theme-border-accent shadow-2xl relative bg-[var(--color-bg)]">
                 <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop" alt="Bride" className="w-full h-full object-cover rounded-t-full" />
               </div>
               <h4 className="font-heading text-3xl theme-text font-bold mb-2">Juliet Capulet</h4>
@@ -324,17 +399,19 @@ export default function DefaultTheme() {
 
         {/* Event Section */}
         <section id="event" className="py-24 px-6 relative overflow-hidden">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16">
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16 relative z-10">
             <h3 className="font-heading text-5xl theme-text mb-3">Rangkaian Acara</h3>
             <p className="theme-text text-sm opacity-75">Dengan memohon rahmat Allah SWT</p>
           </motion.div>
 
-          <div className="space-y-8 relative z-10">
+          <div className="space-y-16 relative z-10 w-full max-w-sm mx-auto">
             {/* Akad Card */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeRight} className="rounded-[2.5rem] p-10 text-center shadow-xl theme-bg-surface border border-[var(--color-accent)]/20 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-2 h-full theme-bg-accent" />
-              <h4 className="font-heading text-3xl theme-text-accent font-bold mb-8 uppercase tracking-widest">Akad Nikah</h4>
-              <div className="flex flex-col items-center space-y-4 mb-10 theme-text">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeRight} className="text-center relative">
+              <DynamicOrnament themeId={themeId} type="separator" className="w-24 h-32 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+              <h4 className="font-heading text-4xl theme-text-accent font-bold mb-6 uppercase tracking-widest relative z-10">Akad Nikah</h4>
+              <div className="flex flex-col items-center space-y-4 mb-8 theme-text relative z-10">
                 <div className="flex items-center space-x-3 w-full justify-center">
                   <Calendar className="w-5 h-5 theme-text-accent" />
                   <span className="text-base font-semibold tracking-wide">Minggu, 19 Juli 2026</span>
@@ -344,16 +421,18 @@ export default function DefaultTheme() {
                   <span className="text-base font-semibold tracking-wide">08:00 WIB - Selesai</span>
                 </div>
               </div>
-              <button className="px-8 py-4 rounded-full theme-bg-accent text-[var(--color-bg)] text-xs font-bold uppercase tracking-widest w-full hover:opacity-90 shadow-[0_4px_15px_rgba(0,0,0,0.1)]">
+              <button className="relative z-10 px-8 py-3 rounded-full border border-[var(--color-accent)] theme-text-accent text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] transition-colors shadow-sm">
                 Simpan ke Kalender
               </button>
             </motion.div>
 
+            <div className="w-24 h-px theme-bg-accent mx-auto opacity-30" />
+
             {/* Resepsi Card */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeLeft} className="rounded-[2.5rem] p-10 text-center shadow-xl theme-bg-surface border border-[var(--color-accent)]/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-2 h-full theme-text" style={{ backgroundColor: 'var(--color-text)' }} />
-              <h4 className="font-heading text-3xl theme-text font-bold mb-8 uppercase tracking-widest">Resepsi</h4>
-              <div className="flex flex-col items-center space-y-4 mb-8 theme-text">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeLeft} className="text-center relative">
+              <DynamicOrnament themeId={themeId} type="separator" className="w-24 h-32 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10" />
+              <h4 className="font-heading text-4xl theme-text font-bold mb-6 uppercase tracking-widest relative z-10">Resepsi</h4>
+              <div className="flex flex-col items-center space-y-4 mb-8 theme-text relative z-10">
                 <div className="flex items-center space-x-3 w-full justify-center">
                   <Calendar className="w-5 h-5 theme-text-accent" />
                   <span className="text-base font-semibold tracking-wide">Minggu, 19 Juli 2026</span>
@@ -363,12 +442,12 @@ export default function DefaultTheme() {
                   <span className="text-base font-semibold tracking-wide">11:00 WIB - Selesai</span>
                 </div>
               </div>
-              <div className="flex flex-col items-center space-y-2 mb-10 theme-text p-6 border border-[var(--color-accent)]/20 rounded-3xl">
-                <MapPin className="w-8 h-8 theme-text-accent mb-3" />
-                <span className="text-lg font-extrabold uppercase tracking-wide">Ballroom Hotel Harmoni</span>
+              <div className="flex flex-col items-center space-y-2 mb-8 theme-text relative z-10">
+                <MapPin className="w-6 h-6 theme-text-accent mb-2" />
+                <span className="text-lg font-bold uppercase tracking-wide">Ballroom Hotel Harmoni</span>
                 <span className="text-sm opacity-80 mt-1">Jl. Raya Pasundan No. 123, Jawa Barat</span>
               </div>
-              <button className="px-8 py-4 rounded-full theme-text theme-bg-surface border border-[var(--color-text)] text-xs font-bold uppercase tracking-widest w-full hover:bg-[var(--color-text)] hover:text-[var(--color-bg)] transition-colors">
+              <button className="relative z-10 px-8 py-3 rounded-full theme-text border border-[var(--color-text)] text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-text)] hover:text-[var(--color-bg)] transition-colors shadow-sm">
                 Buka Google Maps
               </button>
             </motion.div>
@@ -376,20 +455,23 @@ export default function DefaultTheme() {
         </section>
 
         {/* Digital Envelope (Amplop Digital) */}
-        <section id="gift" className="py-24 px-6 relative border-t-[12px] border-b-[12px] theme-border-accent theme-bg-surface">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+        <section id="gift" className="py-24 px-6 relative border-y-[12px] theme-border-accent overflow-hidden theme-bg-surface">
+          <div className="absolute inset-0 theme-pattern-bg z-0 opacity-40" />
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 relative z-10">
             <h3 className="font-heading text-4xl theme-text mb-3">Tanda Kasih</h3>
             <p className="theme-text text-sm opacity-75">Bagi keluarga & sahabat yang ingin memberikan hadiah</p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="rounded-[2rem] p-8 text-center shadow-lg theme-bg-surface border border-[var(--color-accent)]/20 relative">
-            <Gift className="w-12 h-12 theme-text-accent mx-auto mb-8" />
-            <div className="bg-[var(--color-bg)] p-6 rounded-3xl border border-[var(--color-accent)]/10">
-              <CreditCard className="w-8 h-8 theme-text mx-auto mb-4" />
-              <p className="font-heading text-2xl theme-text tracking-widest">1234 5678 9012</p>
-              <p className="text-sm theme-text opacity-80 mt-2 font-medium">Bank BCA a.n Romeo Montague</p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="p-8 text-center relative z-10 max-w-sm mx-auto">
+            <DynamicOrnament themeId={themeId} type="separator" className="w-32 h-48 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 pointer-events-none" />
+            <Gift className="w-10 h-10 theme-text-accent mx-auto mb-8 relative z-10" />
+            <div className="relative z-10">
+              <CreditCard className="w-6 h-6 theme-text mx-auto mb-4 opacity-50" />
+              <p className="font-heading text-3xl theme-text tracking-widest mb-2">1234 5678 9012</p>
+              <p className="text-sm theme-text opacity-80 font-medium">Bank BCA a.n Romeo Montague</p>
               
-              <button onClick={handleCopy} className="mt-6 px-8 py-3 rounded-full theme-bg-accent text-[var(--color-bg)] text-xs font-bold uppercase tracking-widest flex items-center justify-center space-x-2 mx-auto hover:opacity-90 transition-opacity">
+              <button onClick={handleCopy} className="mt-8 px-8 py-3 rounded-full border border-[var(--color-accent)] theme-text-accent text-[10px] font-bold uppercase tracking-widest flex items-center justify-center space-x-2 mx-auto hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)] transition-all shadow-sm">
                 {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 <span>{copied ? "Berhasil Disalin!" : "Salin Rekening"}</span>
               </button>
@@ -399,7 +481,9 @@ export default function DefaultTheme() {
 
         {/* Gallery Masonry */}
         <section id="gallery" className="py-24 px-6 overflow-hidden relative">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
+
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 relative z-10">
             <h3 className="font-heading text-5xl theme-text mb-3">Galeri</h3>
             <p className="theme-text text-sm opacity-75">Momen bahagia kami</p>
           </motion.div>
@@ -413,13 +497,15 @@ export default function DefaultTheme() {
         </section>
 
         {/* RSVP Form */}
-        <section id="rsvp" className="py-24 px-6 border-t-[16px] theme-border-accent theme-bg-surface">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
+        <section id="rsvp" className="py-24 px-6 border-t-[16px] theme-border-accent overflow-hidden relative theme-bg-surface">
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
+          
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 relative z-10">
             <h3 className="font-heading text-5xl theme-text mb-3">RSVP</h3>
             <p className="theme-text text-sm opacity-75">Kehadiran & Buku Tamu</p>
           </motion.div>
 
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="p-8 mb-12 max-w-sm mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn} className="p-8 mb-12 relative z-10 max-w-sm mx-auto">
             <form onSubmit={handleRsvpSubmit} className="space-y-6">
               <div>
                 <input 
@@ -462,7 +548,7 @@ export default function DefaultTheme() {
           </motion.div>
 
           {/* Wishes List (Simple Vertical) */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="space-y-0 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar w-full max-w-md mx-auto text-left">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="space-y-0 max-h-[400px] overflow-y-auto pr-4 custom-scrollbar relative z-10 w-full max-w-md mx-auto text-left">
             {wishes.map((wish) => (
               <div key={wish.id} className="py-5 border-b border-[var(--color-accent)]/20 last:border-0">
                 <h5 className="font-bold theme-text text-sm mb-1">{wish.name}</h5>
@@ -473,11 +559,13 @@ export default function DefaultTheme() {
         </section>
 
         {/* Footer */}
-        <footer className="py-24 text-center theme-bg-surface theme-text relative">
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-sm mb-6 opacity-90 px-8 italic max-w-[300px] mx-auto leading-relaxed">
+        <footer className="py-24 text-center theme-bg-surface theme-text relative overflow-hidden">
+          <div className="absolute inset-0 theme-pattern-bg z-0" />
+          
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-sm mb-6 opacity-90 px-8 italic max-w-[300px] mx-auto leading-relaxed relative z-10">
             "Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu berkenan hadir."
           </motion.p>
-          <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="font-heading text-6xl mt-12 mb-16 theme-text-accent">
+          <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="font-script text-7xl mt-12 mb-16 theme-text-accent">
             R & J
           </motion.h3>
           <button 
