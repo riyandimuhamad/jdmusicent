@@ -28,6 +28,10 @@ export default function AdminLayout({ children }) {
             <Users className="w-5 h-5" />
             <span>Daftar Tamu (RSVP)</span>
           </Link>
+          <Link href="/admin/clients" className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 hover:text-navy-dark transition-colors font-semibold text-sm">
+            <Globe className="w-5 h-5" />
+            <span>Manajemen Klien</span>
+          </Link>
           <Link href="/admin/broadcast" className="flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 hover:text-navy-dark transition-colors font-semibold text-sm">
             <Send className="w-5 h-5" />
             <span>WA Broadcast</span>
