@@ -202,12 +202,32 @@ export default function UndanganPage() {
                     onClick={() => setPreviewThemeId(theme.id)}
                   >
                     <div className="relative w-full h-full bg-navy-dark rounded-xl shadow-xl overflow-hidden border border-white/10 group-hover/img:border-gold/50 transition-colors duration-500">
-                      <Image
-                        src={theme.previewUrl || "/logo-3d.png"}
-                        alt={theme.name}
-                        fill
-                        className="object-cover"
-                      />
+                      {/* Dynamic CSS Mockup (Sangat Ringan, Muncul Otomatis!) */}
+                      <div 
+                        className="absolute inset-0 flex flex-col items-center justify-center p-6 border-8 transition-transform duration-700 group-hover/img:scale-105"
+                        style={{ 
+                          backgroundColor: theme.colors[0], 
+                          borderColor: theme.colors[1] || 'rgba(255,255,255,0.1)' 
+                        }}
+                      >
+                        {/* Ornament Mockup */}
+                        <div 
+                          className="w-20 h-20 rounded-full border-[3px] border-dashed mb-6 opacity-60 flex items-center justify-center"
+                          style={{ borderColor: theme.colors[2] }}
+                        >
+                           <div className="w-10 h-10 rounded-full opacity-40" style={{ backgroundColor: theme.colors[2] }} />
+                        </div>
+                        
+                        {/* Text Mockup */}
+                        <div className="w-3/4 h-3 rounded-full mb-3 opacity-80" style={{ backgroundColor: theme.colors[3] }} />
+                        <div className="w-1/2 h-2 rounded-full mb-8 opacity-50" style={{ backgroundColor: theme.colors[3] }} />
+                        
+                        {/* Button Mockup */}
+                        <div className="w-full max-w-[140px] h-8 rounded-full opacity-90 shadow-md" style={{ backgroundColor: theme.colors[2] }} />
+                        
+                        {/* Subtle Pattern Overlay */}
+                        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
+                      </div>
 
                       {/* Hover Play Button Overlay (HANYA DI DALAM GAMBAR) */}
                       <div className="absolute inset-0 z-20 bg-navy-dark/60 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -260,7 +280,7 @@ export default function UndanganPage() {
       {/* Preview Modal */}
       {previewThemeId && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-4xl max-h-[90vh] bg-navy-dark border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+          <div className="relative w-full max-w-4xl max-h-[90vh] min-h-[500px] md:min-h-[600px] bg-navy-dark border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
             {/* Close Button */}
             <button
               onClick={() => setPreviewThemeId(null)}
@@ -269,16 +289,16 @@ export default function UndanganPage() {
               <X className="w-4 h-4" />
             </button>
 
-            {/* Left: Image Full */}
-            <div className="relative w-full md:w-1/2 h-64 md:h-auto bg-black border-b md:border-b-0 md:border-r border-white/10">
+            {/* Left: Live Iframe Preview */}
+            <div className="relative w-full md:w-1/2 h-[60vh] md:h-auto bg-navy-darker border-b md:border-b-0 md:border-r border-white/10 overflow-hidden">
               {(() => {
                 const pTheme = themesData.find(t => t.id === previewThemeId);
+                // Menambahkan query param ?coverOnly=true agar theme hanya merender halaman cover (sangat ringan)
                 return (
-                  <Image
-                    src={pTheme?.previewUrl || "/logo-3d.png"}
-                    alt={pTheme?.name || "Preview"}
-                    fill
-                    className="object-cover"
+                  <iframe 
+                    src={`/demo/${pTheme?.id}?coverOnly=true`} 
+                    className="w-full h-full border-0 absolute inset-0 pointer-events-none"
+                    title={pTheme?.name || "Live Theme Preview"}
                   />
                 );
               })()}

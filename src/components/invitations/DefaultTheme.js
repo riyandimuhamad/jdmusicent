@@ -16,6 +16,7 @@ export default function DefaultTheme() {
   const themeId = params.themeId;
   const searchParams = useSearchParams();
   const guestNameParam = searchParams.get("to") || "Tamu Kehormatan";
+  const isCoverOnly = searchParams.get("coverOnly") === "true";
   
   const [theme, setTheme] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -212,6 +213,7 @@ export default function DefaultTheme() {
       </AnimatePresence>
 
       {/* --- INVITATION CONTENT --- */}
+      {!isCoverOnly && (
       <main className="w-full max-w-[480px] mx-auto min-h-screen relative shadow-2xl pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
         
         {/* Hidden Audio */}
@@ -291,8 +293,8 @@ export default function DefaultTheme() {
           </motion.div>
         </section>
 
-        {/* Mempelai Section (Arch Photos) */}
-        <section id="couple" className="py-24 px-8 text-center relative border-t border-[var(--color-text)]/5">
+        {/* Mempelai Section */}
+        <section id="couple" className="py-24 px-8 text-center relative border-y-[12px] theme-border-accent overflow-hidden theme-bg-surface">
           <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="font-heading text-5xl theme-text mb-16">
             Mempelai
           </motion.h3>
@@ -321,7 +323,7 @@ export default function DefaultTheme() {
         </section>
 
         {/* Event Section */}
-        <section id="event" className="py-24 px-6 relative border-t border-[var(--color-text)]/5">
+        <section id="event" className="py-24 px-6 relative overflow-hidden">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16">
             <h3 className="font-heading text-5xl theme-text mb-3">Rangkaian Acara</h3>
             <p className="theme-text text-sm opacity-75">Dengan memohon rahmat Allah SWT</p>
@@ -374,7 +376,7 @@ export default function DefaultTheme() {
         </section>
 
         {/* Digital Envelope (Amplop Digital) */}
-        <section id="gift" className="py-24 px-6 relative border-t border-[var(--color-text)]/5">
+        <section id="gift" className="py-24 px-6 relative border-t-[12px] border-b-[12px] theme-border-accent theme-bg-surface">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
             <h3 className="font-heading text-4xl theme-text mb-3">Tanda Kasih</h3>
             <p className="theme-text text-sm opacity-75">Bagi keluarga & sahabat yang ingin memberikan hadiah</p>
@@ -396,7 +398,7 @@ export default function DefaultTheme() {
         </section>
 
         {/* Gallery Masonry */}
-        <section id="gallery" className="py-24 px-6 border-t border-[var(--color-text)]/5" style={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
+        <section id="gallery" className="py-24 px-6 overflow-hidden relative">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12">
             <h3 className="font-heading text-5xl theme-text mb-3">Galeri</h3>
             <p className="theme-text text-sm opacity-75">Momen bahagia kami</p>
@@ -524,8 +526,8 @@ export default function DefaultTheme() {
           </div>
         </motion.div>
 
-
       </main>
+      )}
     </div>
   );
 }

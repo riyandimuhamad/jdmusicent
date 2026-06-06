@@ -17,6 +17,7 @@ export default function PrianganTheme() {
   const themeId = params.themeId;
   const searchParams = useSearchParams();
   const guestNameParam = searchParams.get("to") || "Tamu Kehormatan";
+  const isCoverOnly = searchParams.get("coverOnly") === "true";
   
   const [theme, setTheme] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -256,6 +257,7 @@ export default function PrianganTheme() {
       </AnimatePresence>
 
       {/* --- INVITATION CONTENT --- */}
+      {!isCoverOnly && (
       <main className="w-full max-w-[480px] mx-auto min-h-screen relative shadow-2xl pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
         
         {/* Hidden Audio */}
@@ -351,9 +353,8 @@ export default function PrianganTheme() {
         </section>
 
         {/* Mempelai Section (Arch Photos) */}
-        <section id="couple" className="py-24 px-8 text-center relative border-t border-[var(--color-text)]/5 overflow-hidden">
-          <div className="absolute inset-0 priangan-batik-bg z-0" />
-          <div className="premium-frame" />
+        <section id="couple" className="py-24 px-8 text-center relative border-y-[12px] theme-border-accent overflow-hidden theme-bg-surface">
+          <div className="absolute inset-0 priangan-batik-bg z-0 opacity-40" />
 
           <motion.h3 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="priangan-font-heading text-5xl theme-text mb-16 relative z-10">
             Mempelai
@@ -383,9 +384,8 @@ export default function PrianganTheme() {
         </section>
 
         {/* Event Section */}
-        <section id="event" className="py-24 px-6 relative border-t border-[var(--color-text)]/5 overflow-hidden">
+        <section id="event" className="py-24 px-6 relative overflow-hidden">
           <div className="absolute inset-0 priangan-batik-bg z-0" />
-          <div className="premium-frame" />
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-16 relative z-10">
             <h3 className="priangan-font-heading text-5xl theme-text mb-3">Rangkaian Acara</h3>
@@ -441,9 +441,8 @@ export default function PrianganTheme() {
         </section>
 
         {/* Digital Envelope (Amplop Digital) */}
-        <section id="gift" className="py-24 px-6 relative border-t border-[var(--color-text)]/5 overflow-hidden">
-          <div className="absolute inset-0 priangan-batik-bg z-0" />
-          <div className="premium-frame" />
+        <section id="gift" className="py-24 px-6 relative border-y-[12px] theme-border-accent overflow-hidden theme-bg-surface">
+          <div className="absolute inset-0 priangan-batik-bg z-0 opacity-40" />
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 relative z-10">
             <h3 className="priangan-font-heading text-4xl theme-text mb-3">Tanda Kasih</h3>
@@ -467,9 +466,8 @@ export default function PrianganTheme() {
         </section>
 
         {/* Gallery Masonry */}
-        <section id="gallery" className="py-24 px-6 border-t border-[var(--color-text)]/5 overflow-hidden relative" style={{ backgroundColor: 'rgba(0,0,0,0.02)' }}>
+        <section id="gallery" className="py-24 px-6 overflow-hidden relative">
           <div className="absolute inset-0 priangan-batik-bg z-0" />
-          <div className="premium-frame" />
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 relative z-10">
             <h3 className="priangan-font-heading text-5xl theme-text mb-3">Galeri</h3>
@@ -602,8 +600,8 @@ export default function PrianganTheme() {
           </div>
         </motion.div>
 
-
       </main>
+      )}
     </div>
   );
 }

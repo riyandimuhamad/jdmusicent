@@ -149,13 +149,27 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
 
         {/* Selected Theme Preview */}
         <div className="p-4 sm:p-6 rounded-3xl bg-navy-darker/80 border border-white/10 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row items-center gap-6">
-          <div className="relative w-full sm:w-32 aspect-[3/4] rounded-xl overflow-hidden border border-white/10 shrink-0">
-            <Image 
-              src={selectedTheme.previewUrl || "/logo-3d.png"} 
-              alt={selectedTheme.name} 
-              fill 
-              className="object-cover"
-            />
+          <div 
+            className="relative w-full sm:w-32 aspect-[3/4] rounded-xl overflow-hidden border-4 shrink-0 flex flex-col items-center justify-center p-2"
+            style={{ 
+              backgroundColor: selectedTheme.colors[0], 
+              borderColor: selectedTheme.colors[1] || 'rgba(255,255,255,0.1)' 
+            }}
+          >
+            {/* Ornament Mockup */}
+            <div 
+              className="w-8 h-8 rounded-full border-2 border-dashed mb-3 opacity-60 flex items-center justify-center"
+              style={{ borderColor: selectedTheme.colors[2] }}
+            >
+               <div className="w-4 h-4 rounded-full opacity-40" style={{ backgroundColor: selectedTheme.colors[2] }} />
+            </div>
+            
+            {/* Text Mockup */}
+            <div className="w-3/4 h-1.5 rounded-full mb-1.5 opacity-80" style={{ backgroundColor: selectedTheme.colors[3] }} />
+            <div className="w-1/2 h-1 rounded-full mb-4 opacity-50" style={{ backgroundColor: selectedTheme.colors[3] }} />
+            
+            {/* Subtle Pattern Overlay */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
           </div>
           <div className="flex-1 text-center sm:text-left space-y-2">
             <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-slate-300 uppercase tracking-wider">

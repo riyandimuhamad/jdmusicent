@@ -9,9 +9,9 @@ import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
 
 const getThemeTier = (price) => {
-  if (price >= 350000) return 'Luxury';
-  if (price >= 250000) return 'Eksklusif';
-  return 'Premium';
+  if (price <= 115000) return 'Premium';
+  if (price === 140000) return 'Eksklusif';
+  return 'Luxury';
 };
 
 function BookingFormContent() {
@@ -377,12 +377,32 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                             >
                               {/* Image Cover */}
                               <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
-                                <Image 
-                                  src={theme.previewUrl || "/logo-3d.png"} 
-                                  alt={theme.name} 
-                                  fill 
-                                  className="object-cover transition-transform duration-500 hover:scale-105"
-                                />
+                                {/* Dynamic CSS Mockup */}
+                                <div 
+                                  className="absolute inset-0 flex flex-col items-center justify-center p-4 transition-transform duration-500 hover:scale-105"
+                                  style={{ 
+                                    backgroundColor: theme.colors[0], 
+                                    borderColor: theme.colors[1] || 'rgba(255,255,255,0.1)' 
+                                  }}
+                                >
+                                  {/* Ornament Mockup */}
+                                  <div 
+                                    className="w-12 h-12 rounded-full border-[2px] border-dashed mb-4 opacity-60 flex items-center justify-center"
+                                    style={{ borderColor: theme.colors[2] }}
+                                  >
+                                     <div className="w-6 h-6 rounded-full opacity-40" style={{ backgroundColor: theme.colors[2] }} />
+                                  </div>
+                                  
+                                  {/* Text Mockup */}
+                                  <div className="w-3/4 h-2 rounded-full mb-2 opacity-80" style={{ backgroundColor: theme.colors[3] }} />
+                                  <div className="w-1/2 h-1.5 rounded-full mb-6 opacity-50" style={{ backgroundColor: theme.colors[3] }} />
+                                  
+                                  {/* Button Mockup */}
+                                  <div className="w-full max-w-[100px] h-6 rounded-full opacity-90 shadow-md mb-8" style={{ backgroundColor: theme.colors[2] }} />
+                                  
+                                  {/* Subtle Pattern Overlay */}
+                                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
+                                </div>
                                 {/* Gradient Overlay for bottom text */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-navy-darker via-navy-darker/40 to-transparent opacity-90" />
                                 
