@@ -10,7 +10,7 @@ export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear() || 2026;
 
-  if (pathname.startsWith('/demo')) return null;
+  if (pathname.startsWith('/demo') || pathname.startsWith('/admin')) return null;
 
   return (
     <footer className="bg-navy-dark border-t border-white/5 relative z-10">

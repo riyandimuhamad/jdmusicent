@@ -7,6 +7,7 @@ import { Calendar, User, Phone, MapPin, FileText, CheckCircle, Gift, Sparkles, S
 import packagesData from "@/data/packages.json";
 import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
+import { mockDb } from "@/lib/supabase";
 
 const getThemeTier = (price) => {
   if (price <= 115000) return 'Premium';
@@ -97,7 +98,7 @@ function BookingFormContent() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -134,6 +135,22 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    // Simpan ke database
+    const newBooking = {
+      name: formData.name,
+      whatsapp: formData.whatsapp,
+      date: formData.date,
+      venue: formData.venue,
+      packageId: selectedPackageId,
+      packageName: selectedPackage?.name || "",
+      themeId: isPremiumPackage || isAddonChecked ? selectedThemeId : null,
+      themeName: isPremiumPackage || isAddonChecked ? selectedTheme.name : null,
+      totalPrice: totalPrice,
+      notes: formData.notes
+    };
+    
+    await mockDb.addBooking(newBooking);
 
     // Simpan URL dan buka modal (menghindari popup blocker)
     setWaUrl(whatsappUrl);

@@ -36,7 +36,7 @@ export default function Navbar() {
     { name: "Booking Acara", href: "/booking" },
   ];
 
-  if (pathname.startsWith('/demo')) return null;
+  if (pathname.startsWith('/demo') || pathname.startsWith('/admin')) return null;
 
   return (
     <header

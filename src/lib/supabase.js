@@ -13,7 +13,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
  * Includes 'clients' table and 'guests' table with client_id relationships.
  */
 
-let mockClients = [
+let initialMockClients = [
   { 
     id: 'revi-adam', 
     groom: 'Adam', 
@@ -40,6 +40,20 @@ let mockClients = [
   }
 ];
 
+const getLocalClients = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('jd_mock_clients');
+    if (saved) return JSON.parse(saved);
+  }
+  return initialMockClients;
+};
+
+const saveLocalClients = (data) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jd_mock_clients', JSON.stringify(data));
+  }
+};
+
 // In-memory mock data with client_id
 let mockGuests = [
   { id: 1, client_id: 'revi-adam', name: 'Budi Santoso', status: 'hadir', message: 'Selamat menempuh hidup baru!', created_at: new Date(Date.now() - 3600000).toISOString() },
@@ -47,12 +61,69 @@ let mockGuests = [
   { id: 3, client_id: 'budi-ani', name: 'Andi Pratama', status: 'tidak', message: 'Maaf belum bisa hadir, doa terbaik.', created_at: new Date(Date.now() - 86400000).toISOString() }
 ];
 
+// Helper to get bookings from localStorage or fallback
+const getLocalBookings = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('jd_mock_bookings');
+    if (saved) return JSON.parse(saved);
+  }
+  return [
+    {
+      id: 1,
+      name: 'Anisa Rahmawati',
+      whatsapp: '081234567890',
+      date: '2026-10-15',
+      venue: 'Sheraton Hotel, Lt. 2 Ballroom, Bandung',
+      packageId: 'full-band',
+      packageName: 'Full Band Package',
+      themeId: 'lokal-sunda-priangan',
+      themeName: 'Sunda Priangan',
+      totalPrice: 4605000,
+      notes: 'Lagu wajib: Sempurna, Akad.',
+      status: 'Menunggu Konfirmasi',
+      created_at: new Date(Date.now() - 3600000).toISOString()
+    }
+  ];
+};
+
+// Helper to save bookings to localStorage
+const saveLocalBookings = (data) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jd_mock_bookings', JSON.stringify(data));
+  }
+};
+
+// USER MANAGEMENT (RBAC) MOCK
+const getLocalUsers = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('jd_mock_users');
+    if (saved) return JSON.parse(saved);
+  }
+  return [
+    {
+      id: 1,
+      username: 'admin',
+      password: 'admin@jdmusicent',
+      role: 'superadmin',
+      name: 'Super Admin',
+      created_at: new Date().toISOString()
+    }
+  ];
+};
+
+const saveLocalUsers = (data) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jd_mock_users', JSON.stringify(data));
+  }
+};
+
 export const mockDb = {
   // Get specific client by slug
   getClient: async (clientSlug) => {
     return new Promise(resolve => {
       setTimeout(() => {
-        const client = mockClients.find(c => c.id === clientSlug);
+        const clients = getLocalClients();
+        const client = clients.find(c => c.id === clientSlug);
         resolve(client || null);
       }, 300);
     });
@@ -62,7 +133,7 @@ export const mockDb = {
   getClients: async () => {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve([...mockClients]);
+        resolve(getLocalClients());
       }, 300);
     });
   },
@@ -71,8 +142,9 @@ export const mockDb = {
   addClient: async (clientData) => {
     return new Promise(resolve => {
       setTimeout(() => {
+        const clients = getLocalClients();
         const newClient = { ...clientData };
-        mockClients = [newClient, ...mockClients];
+        saveLocalClients([newClient, ...clients]);
         resolve(newClient);
       }, 500);
     });
@@ -112,6 +184,209 @@ export const mockDb = {
         const absent = filtered.filter(g => g.status === 'tidak').length;
         resolve({ total, attending, absent });
       }, 300);
+    });
+  },
+
+  getDashboardStats: async () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const bookings = getLocalBookings();
+        const totalBookings = bookings.length;
+        const pendingBookings = bookings.filter(b => b.status === 'Menunggu Konfirmasi').length;
+        
+        const clients = getLocalClients();
+        const totalClients = clients.length;
+        
+        const totalRsvp = mockGuests.length;
+        const attendingRsvp = mockGuests.filter(g => g.status === 'hadir').length;
+        const absentRsvp = mockGuests.filter(g => g.status === 'tidak').length;
+
+        resolve({
+          bookings: { total: totalBookings, pending: pendingBookings },
+          clients: { total: totalClients },
+          rsvps: { total: totalRsvp, attending: attendingRsvp, absent: absentRsvp }
+        });
+      }, 300);
+    });
+  },
+
+  getRecentActivities: async () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const bookings = getLocalBookings().map(b => ({
+          id: `b_${b.id}`,
+          type: 'booking',
+          title: `Pesanan Baru: ${b.packageName || 'Live Band'}`,
+          description: `${b.name} (${b.date})`,
+          created_at: b.created_at
+        }));
+
+        const guests = mockGuests.map(g => ({
+          id: `g_${g.id}`,
+          type: 'rsvp',
+          title: `RSVP ${g.status === 'hadir' ? 'Hadir' : 'Tidak Hadir'}`,
+          description: `${g.name} untuk acara ${g.client_id}`,
+          created_at: g.created_at
+        }));
+
+        const allActivities = [...bookings, ...guests]
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .slice(0, 5);
+
+        resolve(allActivities);
+      }, 300);
+    });
+  },
+
+  // Get all bookings
+  getBookings: async () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(getLocalBookings());
+      }, 300);
+    });
+  },
+
+  // Add new booking
+  addBooking: async (bookingData) => {
+    return new Promise(resolve => {
+      const currentBookings = getLocalBookings();
+      const newBooking = {
+        id: Date.now(),
+        ...bookingData,
+        status: 'Menunggu Konfirmasi',
+        created_at: new Date().toISOString()
+      };
+      saveLocalBookings([newBooking, ...currentBookings]);
+      setTimeout(() => resolve(newBooking), 500);
+    });
+  },
+
+  // Update booking status
+  updateBookingStatus: async (id, status) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const currentBookings = getLocalBookings();
+        const updated = currentBookings.map(b => 
+          b.id === id ? { ...b, status } : b
+        );
+        saveLocalBookings(updated);
+        resolve(true);
+      }, 300);
+    });
+  },
+
+  // --- USER MANAGEMENT (RBAC) MOCK ---
+  
+  login: async (username, password) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const users = getLocalUsers();
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+          // Store session in localStorage for mockup
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('jd_session', JSON.stringify({ username: user.username, role: user.role, name: user.name }));
+          }
+          resolve({ success: true, user });
+        } else {
+          resolve({ success: false, error: 'Username atau Password salah!' });
+        }
+      }, 500);
+    });
+  },
+
+  logout: async () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('jd_session');
+    }
+    return true;
+  },
+
+  getCurrentUser: () => {
+    if (typeof window !== 'undefined') {
+      const session = localStorage.getItem('jd_session');
+      if (session) return JSON.parse(session);
+    }
+    return null;
+  },
+
+  getUsers: async () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(getLocalUsers());
+      }, 300);
+    });
+  },
+
+  addUser: async (userData) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const users = getLocalUsers();
+        if (users.find(u => u.username === userData.username)) {
+          resolve({ success: false, error: 'Username sudah digunakan!' });
+          return;
+        }
+        const newUser = {
+          id: Date.now(),
+          ...userData,
+          created_at: new Date().toISOString()
+        };
+        saveLocalUsers([...users, newUser]);
+        resolve({ success: true, user: newUser });
+      }, 500);
+    });
+  },
+
+  deleteUser: async (username) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const users = getLocalUsers();
+        const filtered = users.filter(u => u.username !== username);
+        saveLocalUsers(filtered);
+        resolve(true);
+      }, 300);
+    });
+  },
+
+  updateUserPassword: async (username, newPassword) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const users = getLocalUsers();
+        const updated = users.map(u => 
+          u.username === username ? { ...u, password: newPassword } : u
+        );
+        saveLocalUsers(updated);
+        resolve(true);
+      }, 300);
+    });
+  },
+
+  updateUser: async (oldUsername, updatedData) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const users = getLocalUsers();
+        // Check if username changed and new username exists
+        if (oldUsername !== updatedData.username && users.find(u => u.username === updatedData.username)) {
+          resolve({ success: false, error: 'Username baru sudah digunakan oleh admin lain!' });
+          return;
+        }
+        
+        const updated = users.map(u => {
+          if (u.username === oldUsername) {
+            // Only update password if provided
+            const newData = { ...u, name: updatedData.name, username: updatedData.username, role: updatedData.role };
+            if (updatedData.password) {
+              newData.password = updatedData.password;
+            }
+            return newData;
+          }
+          return u;
+        });
+        
+        saveLocalUsers(updated);
+        resolve({ success: true });
+      }, 500);
     });
   }
 };
