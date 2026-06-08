@@ -157,6 +157,11 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
 
     setIsSubmitting(false);
     setShowSuccessModal(true);
+    
+    // Attempt to open WhatsApp automatically
+    setTimeout(() => {
+      window.open(whatsappUrl, '_blank');
+    }, 500);
   };
 
   return (

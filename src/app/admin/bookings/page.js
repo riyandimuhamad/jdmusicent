@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { formatIDR } from "@/lib/utils";
+import { formatIDR, cn } from "@/lib/utils";
 import { mockDb } from "@/lib/supabase";
-import { CalendarDays, Search, CheckCircle, XCircle, Clock, Eye, X, MapPin, Music, Phone } from "lucide-react";
+import { CalendarDays, Search, CheckCircle, XCircle, Clock, Eye, X, MapPin, Music, Phone, RefreshCw, Trash2 } from "lucide-react";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('Semua');
 
   useEffect(() => {
     loadBookings();
@@ -32,6 +33,14 @@ export default function AdminBookingsPage() {
     }
     await mockDb.updateBookingStatus(id, newStatus);
     await loadBookings();
+  };
+
+  const handleDeleteBooking = async (id) => {
+    const isConfirmed = window.confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data pesanan ini secara permanen?`);
+    if (isConfirmed) {
+      await mockDb.deleteBooking(id);
+      await loadBookings();
+    }
   };
 
   const renderStatusBadge = (status) => {
@@ -61,6 +70,11 @@ export default function AdminBookingsPage() {
     }
   };
 
+  const filteredBookings = bookings.filter(b => {
+    if (statusFilter === 'Semua') return true;
+    return b.status === statusFilter;
+  });
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -76,9 +90,30 @@ export default function AdminBookingsPage() {
             <CalendarDays className="w-5 h-5 text-gold" />
             <span>Daftar Pesanan Masuk</span>
           </h3>
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder="Cari pemesan..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-64 bg-navy-darker text-white placeholder-slate-500" />
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 bg-navy-darker text-white w-full sm:w-auto"
+            >
+              <option value="Semua">Semua Status</option>
+              <option value="Menunggu Konfirmasi">Menunggu</option>
+              <option value="Dikonfirmasi">Konfirmasi</option>
+              <option value="Ditolak">Tolak</option>
+            </select>
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
+              <div className="relative w-full">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input type="text" placeholder="Cari pemesan..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-full sm:w-64 bg-navy-darker text-white placeholder-slate-500" />
+              </div>
+              <button 
+                onClick={loadBookings}
+              className="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              title="Refresh Data"
+            >
+              <RefreshCw className={cn("w-4 h-4", loading && "animate-spin text-gold")} />
+            </button>
+          </div>
           </div>
         </div>
         
@@ -98,7 +133,7 @@ export default function AdminBookingsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
-                {bookings.map((booking) => (
+                {filteredBookings.map((booking) => (
                   <tr key={booking.id} className="hover:bg-white/5 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-bold text-white text-sm">{booking.name}</div>
@@ -125,20 +160,27 @@ export default function AdminBookingsPage() {
                       <div className="flex items-center justify-start space-x-2">
                         <button 
                           onClick={() => setSelectedBooking(booking)}
-                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-white/10 text-slate-300 hover:bg-gold/10 hover:text-gold hover:border-gold/30 transition-colors text-xs font-semibold"
+                          className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-white/10 text-slate-300 hover:bg-gold/10 hover:text-gold hover:border-gold/30 transition-colors"
                           title="Lihat Detail"
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          <Eye className="w-4 h-4" />
                         </button>
                         <select
                           value={booking.status}
                           onChange={(e) => handleStatusChange(booking.id, e.target.value)}
-                          className="text-xs border border-white/10 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-gold/50 bg-navy-darker text-white"
+                          className="text-xs h-[34px] border border-white/10 rounded-lg px-2 focus:outline-none focus:ring-1 focus:ring-gold/50 bg-navy-darker text-white"
                         >
                           <option value="Menunggu Konfirmasi">Menunggu</option>
                           <option value="Dikonfirmasi">Konfirmasi</option>
                           <option value="Ditolak">Tolak</option>
                         </select>
+                        <button 
+                          onClick={() => handleDeleteBooking(booking.id)}
+                          className="flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
+                          title="Hapus Pesanan"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>

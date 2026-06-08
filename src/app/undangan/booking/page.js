@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Phone, User, Calendar, Send, CheckCircle, Clock, MapPin } from "lucide-react";
 import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
+import { mockDb } from "@/lib/supabase";
 
 const getOriginalPrice = (price) => {
   if (price <= 115000) return 150000;
@@ -39,7 +40,15 @@ function BookingUndanganContent() {
     resepsiTime: "",
     venue: "",
     mapsLink: "",
-    notes: ""
+    notes: "",
+    bgmTitle: "",
+    bgmUrl: "",
+    bgmStart: "",
+    driveLink: "",
+    sendViaWa: false,
+    bankName: "",
+    bankAccount: "",
+    bankAccountName: ""
   });
 
   const [errors, setErrors] = useState({});
@@ -50,8 +59,11 @@ function BookingUndanganContent() {
   const selectedTheme = themesData.find((t) => t.id === selectedThemeId) || themesData[0];
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -81,7 +93,7 @@ function BookingUndanganContent() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -112,6 +124,17 @@ Tanggal Resepsi: ${formatDate(formData.resepsiDate)} @ ${formData.resepsiTime ||
 Lokasi/Venue   : ${formData.venue}
 Link Gmaps     : ${formData.mapsLink || "-"}
 
+*ASET & MEDIA*
+Lagu BGM       : ${formData.bgmTitle || "-"}
+Link BGM       : ${formData.bgmUrl || "-"}
+Mulai di Detik : ${formData.bgmStart || "-"}
+Foto Prewedding: ${formData.sendViaWa ? "Akan dikirim manual via WA" : (formData.driveLink || "-")}
+
+*ANGPAO / GIFT*
+Bank/E-Wallet  : ${formData.bankName || "-"}
+No. Rekening   : ${formData.bankAccount || "-"}
+Atas Nama      : ${formData.bankAccountName || "-"}
+
 *Catatan Khusus*: 
 ${formData.notes.trim() || "-"}
 
@@ -122,16 +145,52 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${adminWhatsapp}?text=${encodedMessage}`;
 
+    // Save to Admin Clients
+    const slug = `${formData.groomName.toLowerCase().split(' ')[0]}-${formData.brideName.toLowerCase().split(' ')[0]}`;
+    const clientData = {
+      id: slug,
+      groom: formData.groomName,
+      bride: formData.brideName,
+      short: formData.groomNameShort + " & " + formData.brideNameShort,
+      parentsGroom: "",
+      parentsBride: "",
+      themeId: selectedThemeId,
+      eventDateISO: formData.akadDate || formData.resepsiDate,
+      dateStr: new Date(formData.akadDate || formData.resepsiDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase(),
+      status: 'Nonaktif',
+      akad: { date: formData.akadDate, time: formData.akadTime },
+      resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.venue, address: formData.mapsLink },
+      assets: {
+        gallery: [],
+        bgmTitle: formData.bgmTitle,
+        bgmUrl: formData.bgmUrl,
+        bgmStart: formData.bgmStart
+      },
+      gift: {
+        bank: formData.bankName,
+        account: formData.bankAccount,
+        name: formData.bankAccountName
+      }
+    };
+    
+    await mockDb.addClient(clientData);
+
     setWaUrl(whatsappUrl);
     setIsSubmitting(false);
     setShowSuccessModal(true);
+    
+    // Attempt to open WhatsApp automatically
+    setTimeout(() => {
+      window.open(whatsappUrl, '_blank');
+    }, 500);
   };
 
   return (
-    <div className="min-h-screen pt-28 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
-      <div className="absolute top-[10%] right-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
+    <>
+      <div className="min-h-screen pt-28 sm:pt-32 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="absolute top-[10%] right-1/4 w-[500px] h-[500px] rounded-full bg-radial-gradient-glow opacity-25 pointer-events-none z-0" />
 
-      <div className="max-w-4xl mx-auto space-y-12 relative z-10">
+        <div className="max-w-4xl mx-auto space-y-12 relative z-10">
         
         {/* Header */}
         <div className="text-center space-y-4">
@@ -193,7 +252,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
 
         {/* Form Container */}
         <div className="bg-navy-dark border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-10">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-10">
             {/* Section 1 */}
             <div className="space-y-4">
               <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
@@ -433,10 +492,72 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
               </div>
             </div>
 
-            {/* Section 4: Notes */}
+            {/* Section 4: Aset & Media */}
             <div className="space-y-4">
               <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
-                4. Catatan & Keterangan Tambahan
+                4. Aset & Media (Opsional)
+              </h4>
+              <div className="grid grid-cols-1 gap-6 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
+                <div className="space-y-3">
+                  <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-gold border-b border-white/5 pb-2">Musik Latar (BGM)</h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-400">Judul Lagu</label>
+                      <input type="text" name="bgmTitle" value={formData.bgmTitle} onChange={handleInputChange} placeholder="Contoh: A Thousand Years - Christina Perri" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-400">Tautan Lagu (YouTube/Spotify)</label>
+                      <input type="text" name="bgmUrl" value={formData.bgmUrl} onChange={handleInputChange} placeholder="https://..." className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-400">Mulai dari Menit/Detik ke-</label>
+                    <input type="text" name="bgmStart" value={formData.bgmStart} onChange={handleInputChange} placeholder="Contoh: 01:15" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                  </div>
+                </div>
+
+                <div className="space-y-3 pt-4 border-t border-white/5">
+                  <h5 className="font-heading font-bold text-xs uppercase tracking-wider text-gold border-b border-white/5 pb-2">Foto Pre-wedding / Galeri</h5>
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-400">Tautan Folder Foto (Google Drive/Dropbox)</label>
+                    <input type="text" name="driveLink" value={formData.driveLink} onChange={handleInputChange} disabled={formData.sendViaWa} placeholder="https://drive.google.com/..." className={cn("w-full px-4 py-2.5 rounded-lg border text-xs text-white focus:outline-none focus:border-gold transition-colors", formData.sendViaWa ? "bg-white/5 border-white/5 text-slate-600 opacity-50 cursor-not-allowed" : "bg-white/5 border-white/10")} />
+                  </div>
+                  <label className="flex items-center space-x-2 mt-2 cursor-pointer group">
+                    <div className="relative flex items-center justify-center w-4 h-4 rounded border border-white/20 bg-black/20 group-hover:border-gold transition-colors">
+                      <input type="checkbox" name="sendViaWa" checked={formData.sendViaWa} onChange={handleInputChange} className="absolute opacity-0 cursor-pointer w-full h-full" />
+                      {formData.sendViaWa && <CheckCircle className="w-3 h-3 text-gold" />}
+                    </div>
+                    <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">Saya akan mengirimkan foto secara manual via Chat WA</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 5: Angpao */}
+            <div className="space-y-4">
+              <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
+                5. Angpao / Gift (Opsional)
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/5">
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">Nama Bank / E-Wallet</label>
+                  <input type="text" name="bankName" value={formData.bankName} onChange={handleInputChange} placeholder="Contoh: BCA / GoPay" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-slate-400">Nomor Rekening</label>
+                  <input type="text" name="bankAccount" value={formData.bankAccount} onChange={handleInputChange} placeholder="Contoh: 1234567890" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-xs text-slate-400">Atas Nama</label>
+                  <input type="text" name="bankAccountName" value={formData.bankAccountName} onChange={handleInputChange} placeholder="Contoh: Dilan Saputra" className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-gold" />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 6: Notes */}
+            <div className="space-y-4">
+              <h4 className="font-heading font-bold text-sm sm:text-base text-white border-b border-white/5 pb-2">
+                6. Catatan & Keterangan Tambahan
               </h4>
               <div className="space-y-1">
                 <textarea
@@ -483,6 +604,8 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
 
       </div>
 
+      </div>
+
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -493,7 +616,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
             <div>
               <h3 className="font-heading font-black text-2xl text-white mb-2">Pendaftaran Berhasil!</h3>
               <p className="text-sm text-slate-400">
-                Form Anda telah siap. Klik tombol di bawah ini untuk mengirimkannya langsung ke WhatsApp Admin JD Music Entertainment.
+                Data Anda telah masuk ke sistem kami. Klik tombol di bawah ini untuk mengirimkan detail form langsung ke WhatsApp Admin JD Music Entertainment.
               </p>
             </div>
             <div className="space-y-3 pt-2">
@@ -516,7 +639,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

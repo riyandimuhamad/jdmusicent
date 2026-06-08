@@ -345,6 +345,18 @@ export const mockDb = {
     });
   },
 
+  // Delete booking
+  deleteBooking: async (id) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const currentBookings = getLocalBookings();
+        const filtered = currentBookings.filter(b => b.id !== id);
+        saveLocalBookings(filtered);
+        resolve(true);
+      }, 300);
+    });
+  },
+
   // --- USER MANAGEMENT (RBAC) MOCK ---
   
   login: async (username, password) => {

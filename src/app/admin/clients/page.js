@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Globe, Link as LinkIcon, Search, Copy, CheckCircle } from "lucide-react";
+import { Plus, Globe, Link as LinkIcon, Search, Copy, CheckCircle, RefreshCw } from "lucide-react";
 import { mockDb } from "@/lib/supabase";
 import themesData from "@/data/themes.json";
+import { cn } from "@/lib/utils";
 
 export default function AdminClientsPage() {
   const [clients, setClients] = useState([]);
@@ -22,8 +23,9 @@ export default function AdminClientsPage() {
     eventDateISO: "", // Store the actual YYYY-MM-DD
     akadDate: "", akadTime: "",
     resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: "",
-    gallery1: "", gallery2: "", bgmUrl: "",
-    bank: "", account: "", accountName: ""
+    bgmTitle: "", bgmUrl: "", bgmStart: "",
+    bank: "", account: "", accountName: "",
+    galleryItems: [{ type: 'url', src: '' }]
   });
 
   useEffect(() => {
@@ -65,6 +67,69 @@ export default function AdminClientsPage() {
     }
   };
 
+  // Gallery Handlers
+  const handleGalleryTypeToggle = (index) => {
+    setFormData(prev => {
+      const items = [...prev.galleryItems];
+      items[index].type = items[index].type === 'url' ? 'file' : 'url';
+      items[index].src = '';
+      return { ...prev, galleryItems: items };
+    });
+  };
+
+  const handleGallerySrcChange = (index, value) => {
+    setFormData(prev => {
+      const items = [...prev.galleryItems];
+      items[index].src = value;
+      return { ...prev, galleryItems: items };
+    });
+  };
+
+  const handleGalleryFileChange = (index, file) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran file maksimal 2MB!");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 1200;
+        let width = img.width;
+        let height = img.height;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        const base64 = canvas.toDataURL("image/jpeg", 0.7);
+        handleGallerySrcChange(index, base64);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const addGalleryItem = () => {
+    setFormData(prev => ({
+      ...prev,
+      galleryItems: [...prev.galleryItems, { type: 'url', src: '' }]
+    }));
+  };
+
+  const removeGalleryItem = (index) => {
+    setFormData(prev => {
+      const items = [...prev.galleryItems];
+      items.splice(index, 1);
+      return { ...prev, galleryItems: items };
+    });
+  };
+
   const handleDeleteClient = async (slug) => {
     const isConfirmed = window.confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data klien ini secara permanen? Data yang dihapus tidak dapat dikembalikan.`);
     if (isConfirmed) {
@@ -93,8 +158,10 @@ export default function AdminClientsPage() {
       akad: { date: formData.akadDate, time: formData.akadTime },
       resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.resepsiVenue, address: formData.resepsiAddress },
       assets: {
-        gallery: [formData.gallery1, formData.gallery2].filter(Boolean),
-        bgmUrl: formData.bgmUrl
+        gallery: formData.galleryItems.map(item => item.src).filter(Boolean),
+        bgmTitle: formData.bgmTitle,
+        bgmUrl: formData.bgmUrl,
+        bgmStart: formData.bgmStart
       },
       gift: {
         bank: formData.bank,
@@ -112,7 +179,8 @@ export default function AdminClientsPage() {
       groom: "", bride: "", short: "", parentsGroom: "", parentsBride: "",
       themeId: themesData[0].id, eventDateISO: "", akadDate: "", akadTime: "",
       resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: "",
-      gallery1: "", gallery2: "", bgmUrl: "", bank: "", account: "", accountName: ""
+      bgmTitle: "", bgmUrl: "", bgmStart: "", bank: "", account: "", accountName: "",
+      galleryItems: [{ type: 'url', src: '' }]
     });
   };
 
@@ -196,20 +264,80 @@ export default function AdminClientsPage() {
 
               {/* Aset & Media */}
               <div className="space-y-4">
-                <h3 className="font-semibold text-slate-300 text-sm">C. Aset & Media (Opsional)</h3>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1">URL Musik Latar (BGM MP3)</label>
-                  <input name="bgmUrl" value={formData.bgmUrl} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://contoh.com/lagu.mp3" />
+                <h3 className="font-semibold text-slate-300 text-sm border-b border-white/5 pb-2">C. Aset & Media (Opsional)</h3>
+                
+                {/* BGM */}
+                <div className="space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                  <h4 className="font-bold text-xs text-gold uppercase tracking-wider">Musik Latar (BGM)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 mb-1">Judul Lagu</label>
+                      <input name="bgmTitle" value={formData.bgmTitle} onChange={handleChange} className="w-full px-3 py-2 rounded-lg border border-white/10 text-xs bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: A Thousand Years" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 mb-1">URL Tautan Lagu</label>
+                      <input name="bgmUrl" value={formData.bgmUrl} onChange={handleChange} className="w-full px-3 py-2 rounded-lg border border-white/10 text-xs bg-navy-darker text-white placeholder-slate-500" placeholder="https://..." />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Mulai dari Detik Ke-</label>
+                    <input name="bgmStart" value={formData.bgmStart} onChange={handleChange} className="w-full md:w-1/2 px-3 py-2 rounded-lg border border-white/10 text-xs bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: 01:15" />
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-400 mb-1">URL Foto Galeri 1</label>
-                    <input name="gallery1" value={formData.gallery1} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://..." />
+
+                {/* Gallery */}
+                <div className="space-y-3 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                  <h4 className="font-bold text-xs text-gold uppercase tracking-wider">Foto Galeri Pre-Wedding</h4>
+                  <p className="text-[10px] text-slate-400 mb-2">Tambahkan foto menggunakan URL atau unggah file langsung (Otomatis dikompresi agar ringan).</p>
+                  
+                  <div className="space-y-3">
+                    {formData.galleryItems.map((item, index) => (
+                      <div key={index} className="p-3 rounded-lg border border-white/5 bg-black/20 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[11px] font-bold text-slate-300">Foto {index + 1}</label>
+                          <div className="flex space-x-2">
+                            <button type="button" onClick={() => handleGalleryTypeToggle(index)} className="text-[10px] bg-white/5 hover:bg-white/10 px-2 py-1 rounded text-slate-300 transition-colors">
+                              Ubah Tipe: {item.type === 'url' ? 'URL Link' : 'File Lokal'}
+                            </button>
+                            {formData.galleryItems.length > 1 && (
+                              <button type="button" onClick={() => removeGalleryItem(index)} className="text-[10px] bg-red-500/10 text-red-400 px-2 py-1 rounded hover:bg-red-500/20 transition-colors">
+                                Hapus
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {item.type === 'url' ? (
+                          <input 
+                            type="text" 
+                            value={item.src} 
+                            onChange={(e) => handleGallerySrcChange(index, e.target.value)} 
+                            placeholder="https://..." 
+                            className="w-full px-3 py-2 rounded-lg border border-white/10 text-xs bg-navy-darker text-white placeholder-slate-500" 
+                          />
+                        ) : (
+                          <div className="space-y-2">
+                            <input 
+                              type="file" 
+                              accept="image/png, image/jpeg" 
+                              onChange={(e) => handleGalleryFileChange(index, e.target.files[0])} 
+                              className="block w-full text-xs text-slate-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20" 
+                            />
+                            {item.src && <div className="text-[10px] text-green-400 flex items-center space-x-1"><CheckCircle className="w-3 h-3" /><span>Gambar tersimpan (dikompresi)</span></div>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-400 mb-1">URL Foto Galeri 2</label>
-                    <input name="gallery2" value={formData.gallery2} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://..." />
-                  </div>
+
+                  <button 
+                    type="button" 
+                    onClick={addGalleryItem} 
+                    className="w-full py-2.5 mt-2 border border-dashed border-white/20 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:border-white/40 transition-colors flex items-center justify-center space-x-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Tambah Foto Lainnya</span>
+                  </button>
                 </div>
               </div>
 
@@ -261,9 +389,18 @@ export default function AdminClientsPage() {
               <option value="Nonaktif">Nonaktif</option>
               <option value="Diarsipkan">Diarsipkan</option>
             </select>
-            <div className="relative w-full sm:w-auto">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input type="text" placeholder="Cari klien..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-full sm:w-64 bg-navy-darker text-white placeholder-slate-500" />
+            <div className="relative w-full sm:w-auto flex items-center space-x-2">
+              <div className="relative w-full">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input type="text" placeholder="Cari klien..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-full sm:w-64 bg-navy-darker text-white placeholder-slate-500" />
+              </div>
+              <button 
+                onClick={loadClients}
+                className="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                title="Refresh Data"
+              >
+                <RefreshCw className={cn("w-4 h-4", loading && "animate-spin text-gold")} />
+              </button>
             </div>
           </div>
         </div>
