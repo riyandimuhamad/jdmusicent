@@ -63,7 +63,7 @@ function BookingFormContent() {
     : (selectedPackage ? selectedPackage.originalPrice : 0);
 
   const themeAddonPrice = selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()]
-    ? (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice || selectedTheme.priceAddon) - (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount || 0)
+    ? (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice - settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount) - 10000
     : (selectedTheme ? selectedTheme.priceAddon : 0);
 
   const themeOriginalPrice = selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()]
@@ -408,9 +408,10 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                           {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => {
                             const tier = getThemeTier(theme.priceStandalone).toLowerCase();
-                            const addonPrice = settings && settings.invitations[tier]
+                            const dynamicStandalonePrice = settings && settings.invitations[tier]
                               ? settings.invitations[tier].basePrice - settings.invitations[tier].discount
-                              : theme.priceAddon;
+                              : theme.priceStandalone;
+                            const addonPrice = settings && settings.invitations[tier] ? dynamicStandalonePrice - 10000 : theme.priceAddon;
                             return (
                             <div
                               key={theme.id}
@@ -494,7 +495,9 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                             <span className="text-[9px] font-extrabold uppercase bg-gold/15 text-gold px-1.5 py-0.5 rounded tracking-wider whitespace-nowrap">Bundling Promo</span>
                           </div>
                           <span className="text-xs font-bold text-gold whitespace-nowrap">
-                            {isAddonChecked && selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()] ? `+ ${formatIDR(settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice - settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount)}` : "Mulai dari + Rp 105.000"}
+                            {isAddonChecked && selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()] 
+                              ? `+ ${formatIDR((settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice - settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount) - 10000)}` 
+                              : "Mulai dari + Rp 105.000"}
                           </span>
                         </div>
                         <p className="text-xs text-slate-400 mt-1 leading-normal">
@@ -533,9 +536,10 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                           {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => {
                             const tier = getThemeTier(theme.priceStandalone).toLowerCase();
-                            const addonPrice = settings && settings.invitations[tier]
+                            const dynamicStandalonePrice = settings && settings.invitations[tier]
                               ? settings.invitations[tier].basePrice - settings.invitations[tier].discount
-                              : theme.priceAddon;
+                              : theme.priceStandalone;
+                            const addonPrice = settings && settings.invitations[tier] ? dynamicStandalonePrice - 10000 : theme.priceAddon;
                             const stdPrice = settings && settings.invitations[tier]
                               ? settings.invitations[tier].basePrice
                               : theme.priceStandalone;

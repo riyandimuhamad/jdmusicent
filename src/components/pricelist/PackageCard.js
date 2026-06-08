@@ -28,13 +28,29 @@ export default function PackageCard({ pkg, onShowDetails, onBook }) {
           <h3 className="font-serif font-semibold text-2xl md:text-3xl text-slate-100 tracking-wide uppercase mb-2">
             {pkg.name}
           </h3>
-          <div className="flex items-baseline space-x-2 mb-3">
-            <span className="font-heading font-medium text-xl text-gold-warm">
-              {formatIDR(pkg.price)}
-            </span>
-            <span className="text-xs text-slate-500 font-light tracking-wide uppercase">
-              / Acara
-            </span>
+          <div className="flex flex-col mb-3">
+            {pkg.originalPrice && pkg.originalPrice > pkg.price && (
+              <div className="flex items-center space-x-2 mb-1">
+                <div className="relative inline-block text-sm font-bold text-slate-400">
+                  <span className="px-1">{formatIDR(pkg.originalPrice)}</span>
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="w-full h-[1.7px] bg-red-500 -rotate-6 absolute rounded-full"></div>
+                    <div className="w-full h-[1.7px] bg-red-500 rotate-6 absolute rounded-full"></div>
+                  </div>
+                </div>
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/20 uppercase tracking-wider">
+                  Diskon {Math.round(((pkg.originalPrice - pkg.price) / pkg.originalPrice) * 100)}%
+                </span>
+              </div>
+            )}
+            <div className="flex items-baseline space-x-2">
+              <span className="font-heading font-medium text-xl text-gold-warm">
+                {formatIDR(pkg.price)}
+              </span>
+              <span className="text-xs text-slate-500 font-light tracking-wide uppercase">
+                / Acara
+              </span>
+            </div>
           </div>
           <p className="text-sm text-slate-400 font-light leading-relaxed">
             {pkg.tagline}

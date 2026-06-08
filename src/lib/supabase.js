@@ -265,6 +265,19 @@ export const mockDb = {
     });
   },
 
+  updateClientData: async (clientSlug, updatedData) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const clients = getLocalClients();
+        const updated = clients.map(c => 
+          c.id === clientSlug ? { ...c, ...updatedData } : c
+        );
+        saveLocalClients(updated);
+        resolve(true);
+      }, 400);
+    });
+  },
+
   deleteClient: async (clientSlug) => {
     return new Promise(resolve => {
       setTimeout(() => {

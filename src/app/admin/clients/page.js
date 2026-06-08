@@ -152,8 +152,10 @@ export default function AdminClientsPage() {
       parentsGroom: formData.parentsGroom,
       parentsBride: formData.parentsBride,
       themeId: formData.themeId,
-      eventDateISO: formData.eventDateISO,
-      dateStr: new Date(formData.eventDateISO).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase(),
+      eventDateISO: formData.akadDate || formData.resepsiDate || new Date().toISOString().split('T')[0],
+      dateStr: formData.akadDate || formData.resepsiDate 
+        ? new Date(formData.akadDate || formData.resepsiDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()
+        : "-",
       status: 'Aktif',
       akad: { date: formData.akadDate, time: formData.akadTime },
       resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.resepsiVenue, address: formData.resepsiAddress },
@@ -177,7 +179,7 @@ export default function AdminClientsPage() {
     // Reset
     setFormData({
       groom: "", bride: "", short: "", parentsGroom: "", parentsBride: "",
-      themeId: themesData[0].id, eventDateISO: "", akadDate: "", akadTime: "",
+      themeId: themesData[0].id, akadDate: "", akadTime: "",
       resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: "",
       bgmTitle: "", bgmUrl: "", bgmStart: "", bank: "", account: "", accountName: "",
       galleryItems: [{ type: 'url', src: '' }]
@@ -242,23 +244,29 @@ export default function AdminClientsPage() {
               {/* Acara */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-slate-300 text-sm">B. Data Acara</h3>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1">Tanggal Utama Acara</label>
-                  <input required type="date" name="eventDateISO" value={formData.eventDateISO} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
-                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 mb-1">Tanggal Akad</label>
-                    <input name="akadDate" value={formData.akadDate} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Sabtu, 22 Desember" />
+                    <input type="date" required name="akadDate" value={formData.akadDate} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-400 mb-1">Waktu Akad</label>
-                    <input name="akadTime" value={formData.akadTime} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="08:00 WIB" />
+                    <input name="akadTime" value={formData.akadTime} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: 08.00 - 10.00 WIB" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">Tanggal Resepsi</label>
+                    <input type="date" name="resepsiDate" value={formData.resepsiDate} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">Waktu Resepsi</label>
+                    <input name="resepsiTime" value={formData.resepsiTime} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: 11.00 - 14.00 WIB" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-400 mb-1">Lokasi Resepsi</label>
-                  <input name="resepsiVenue" value={formData.resepsiVenue} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Gedung Sate" />
+                  <input name="resepsiVenue" value={formData.resepsiVenue} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: Gedung Sate" />
                 </div>
               </div>
 

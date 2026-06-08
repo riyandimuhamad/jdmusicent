@@ -175,20 +175,44 @@ export default function AdminSettingsPage() {
                       )}
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Potongan Diskon (Rp)</label>
-                    <input 
-                      type="number" 
-                      value={data.discount}
-                      onChange={(e) => handleLiveMusicChange(key, 'discount', e.target.value)}
-                      disabled={!isEditingLiveMusic}
-                      className={cn(
-                        "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
-                        isEditingLiveMusic 
-                          ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
-                          : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
-                      )}
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Diskon (%)</label>
+                      <div className="relative">
+                        <input 
+                          type="number" 
+                          value={data.basePrice > 0 ? Math.round((data.discount / data.basePrice) * 100) : 0}
+                          onChange={(e) => {
+                            const percent = parseInt(e.target.value) || 0;
+                            const rpDiscount = Math.round((data.basePrice * percent) / 100);
+                            handleLiveMusicChange(key, 'discount', rpDiscount);
+                          }}
+                          disabled={!isEditingLiveMusic}
+                          className={cn(
+                            "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
+                            isEditingLiveMusic 
+                              ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
+                              : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
+                          )}
+                        />
+                        {isEditingLiveMusic && <span className="absolute right-3 top-2 text-sm text-slate-400 pointer-events-none">%</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Diskon (Rp)</label>
+                      <input 
+                        type="number" 
+                        value={data.discount}
+                        onChange={(e) => handleLiveMusicChange(key, 'discount', e.target.value)}
+                        disabled={!isEditingLiveMusic}
+                        className={cn(
+                          "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
+                          isEditingLiveMusic 
+                            ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
+                            : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
+                        )}
+                      />
+                    </div>
                   </div>
                   <div className="pt-2 border-t border-white/10">
                     <div className="flex justify-between text-xs">
@@ -270,20 +294,44 @@ export default function AdminSettingsPage() {
                       )}
                     />
                   </div>
-                  <div>
-                    <label className="block text-xs text-slate-400 mb-1">Potongan Diskon (Rp)</label>
-                    <input 
-                      type="number" 
-                      value={data.discount}
-                      onChange={(e) => handleInvitationChange(key, 'discount', e.target.value)}
-                      disabled={!isEditingInvitations}
-                      className={cn(
-                        "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
-                        isEditingInvitations 
-                          ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
-                          : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
-                      )}
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Diskon (%)</label>
+                      <div className="relative">
+                        <input 
+                          type="number" 
+                          value={data.basePrice > 0 ? Math.round((data.discount / data.basePrice) * 100) : 0}
+                          onChange={(e) => {
+                            const percent = parseInt(e.target.value) || 0;
+                            const rpDiscount = Math.round((data.basePrice * percent) / 100);
+                            handleInvitationChange(key, 'discount', rpDiscount);
+                          }}
+                          disabled={!isEditingInvitations}
+                          className={cn(
+                            "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
+                            isEditingInvitations 
+                              ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
+                              : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
+                          )}
+                        />
+                        {isEditingInvitations && <span className="absolute right-3 top-2 text-sm text-slate-400 pointer-events-none">%</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Diskon (Rp)</label>
+                      <input 
+                        type="number" 
+                        value={data.discount}
+                        onChange={(e) => handleInvitationChange(key, 'discount', e.target.value)}
+                        disabled={!isEditingInvitations}
+                        className={cn(
+                          "w-full px-3 py-2 rounded-lg border text-sm focus:outline-none transition-colors",
+                          isEditingInvitations 
+                            ? "bg-navy-dark border-white/10 text-white focus:border-gold" 
+                            : "bg-transparent border-transparent text-white opacity-80 cursor-not-allowed px-0"
+                        )}
+                      />
+                    </div>
                   </div>
                   <div className="pt-2 border-t border-white/10">
                     <div className="flex justify-between text-xs">

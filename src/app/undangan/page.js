@@ -367,19 +367,23 @@ export default function UndanganPage() {
                         <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
                         <div className="flex flex-col space-y-0.5 pt-1">
                           {getDiscountPercentage(pTheme, getDynamicPrice(pTheme)) > 0 && (
-                            <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
-                              {formatIDR(getOriginalPrice(pTheme, pTheme.priceStandalone))}
-                            </span>
+                            <div className="flex items-center space-x-2 mb-1">
+                              <div className="relative inline-block text-sm font-bold text-slate-400">
+                                <span className="px-1">{formatIDR(getOriginalPrice(pTheme, pTheme.priceStandalone))}</span>
+                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <div className="w-full h-[1.7px] bg-red-500 -rotate-6 absolute rounded-full"></div>
+                                  <div className="w-full h-[1.7px] bg-red-500 rotate-6 absolute rounded-full"></div>
+                                </div>
+                              </div>
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/20 uppercase tracking-wider">
+                                Diskon {getDiscountPercentage(pTheme, getDynamicPrice(pTheme))}%
+                              </span>
+                            </div>
                           )}
                           <div className="flex items-end space-x-3">
                             <span className="font-heading font-black text-3xl text-gold drop-shadow-md leading-none">
                               {formatIDR(getDynamicPrice(pTheme))}
                             </span>
-                            {getDiscountPercentage(pTheme, getDynamicPrice(pTheme)) > 0 && (
-                              <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
-                                Diskon {getDiscountPercentage(pTheme, getDynamicPrice(pTheme))}%
-                              </span>
-                            )}
                           </div>
                         </div>
                       </div>
