@@ -20,7 +20,27 @@ export default function AdminContentWrapper({ children }) {
   useEffect(() => {
     const fetchNotifs = async () => {
       const activities = await mockDb.getRecentActivities();
-      setNotifications(activities.slice(0, 3));
+      const clients = await mockDb.getClients();
+      
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      
+      const expiredClients = clients.filter(c => {
+        if (!c.eventDateISO || c.status === 'Diarsipkan') return false;
+        const eventDate = new Date(c.eventDateISO);
+        return now > eventDate;
+      });
+
+      const expiryNotifs = expiredClients.map(c => ({
+        id: `exp_${c.id}`,
+        type: 'expiry',
+        title: `Acara Telah Usai: ${c.short}`,
+        description: `Acara pernikahan klien ini telah lewat. Segera arsipkan undangan.`,
+        created_at: new Date().toISOString(),
+        clientId: c.id
+      }));
+
+      setNotifications([...expiryNotifs, ...activities].slice(0, 5));
     };
     
     if (user && !isAuthPage) {
@@ -68,10 +88,27 @@ export default function AdminContentWrapper({ children }) {
                 <div className="max-h-80 overflow-y-auto custom-scrollbar">
                   {notifications.length > 0 ? (
                     notifications.map(notif => (
-                      <div key={notif.id} className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group">
-                        <p className="text-sm font-bold text-white mb-1 group-hover:text-gold transition-colors">{notif.title}</p>
+                      <div key={notif.id} className="p-4 border-b border-white/5 hover:bg-white/5 transition-colors group">
+                        <p className={`text-sm font-bold mb-1 group-hover:text-gold transition-colors ${notif.type === 'expiry' ? 'text-red-400' : 'text-white'}`}>{notif.title}</p>
                         <p className="text-xs text-slate-400 leading-relaxed">{notif.description}</p>
-                        <p className="text-[10px] text-slate-500 mt-2 font-mono">{new Date(notif.created_at).toLocaleString("id-ID")}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="text-[10px] text-slate-500 font-mono">{new Date(notif.created_at).toLocaleString("id-ID")}</p>
+                          {notif.type === 'expiry' && (
+                            <button 
+                              onClick={async () => {
+                                const isConfirmed = window.confirm(`Apakah Anda yakin ingin mengarsipkan klien ini?`);
+                                if (isConfirmed) {
+                                  await mockDb.updateClientStatus(notif.clientId, 'Diarsipkan');
+                                  alert('Berhasil diarsipkan.');
+                                  window.location.reload();
+                                }
+                              }}
+                              className="text-[10px] bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2 py-1 rounded-md transition-colors font-bold"
+                            >
+                              Arsipkan
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (

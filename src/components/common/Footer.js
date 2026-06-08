@@ -9,8 +9,7 @@ import { Music, Mail, Phone, MapPin, Clock } from "lucide-react";
 export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear() || 2026;
-
-  if (pathname.startsWith('/demo') || pathname.startsWith('/admin')) return null;
+  if (pathname.startsWith('/demo') || pathname.startsWith('/admin') || pathname.startsWith('/invite-wedding') || pathname.startsWith('/client-portal')) return null;
 
   return (
     <footer className="bg-navy-dark border-t border-white/5 relative z-10">

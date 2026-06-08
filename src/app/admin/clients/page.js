@@ -9,14 +9,16 @@ export default function AdminClientsPage() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('Semua');
   const [copiedId, setCopiedId] = useState(null);
+  const [copiedPortalId, setCopiedPortalId] = useState(null);
 
   // Form State
   const [formData, setFormData] = useState({
     groom: "", bride: "", short: "", 
     parentsGroom: "", parentsBride: "",
     themeId: themesData[0].id,
-    dateStr: "",
+    eventDateISO: "", // Store the actual YYYY-MM-DD
     akadDate: "", akadTime: "",
     resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: ""
   });
@@ -33,10 +35,33 @@ export default function AdminClientsPage() {
   };
 
   const handleCopyLink = (slug) => {
-    const url = `${window.location.origin}/undangan/${slug}`;
-    navigator.clipboard.writeText(url);
+    const link = `${window.location.origin}/invite-wedding/${slug}`;
+    navigator.clipboard.writeText(link);
     setCopiedId(slug);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleCopyPortalLink = (slug) => {
+    const link = `${window.location.origin}/client-portal/${slug}`;
+    navigator.clipboard.writeText(link);
+    setCopiedPortalId(slug);
+    setTimeout(() => setCopiedPortalId(null), 2000);
+  };
+
+  const handleStatusChange = async (slug, newStatus) => {
+    const isConfirmed = window.confirm(`Apakah Anda yakin ingin mengubah status klien ini menjadi ${newStatus}?`);
+    if (isConfirmed) {
+      await mockDb.updateClientStatus(slug, newStatus);
+      await loadClients();
+    }
+  };
+
+  const handleDeleteClient = async (slug) => {
+    const isConfirmed = window.confirm(`PERINGATAN: Apakah Anda yakin ingin menghapus data klien ini secara permanen? Data yang dihapus tidak dapat dikembalikan.`);
+    if (isConfirmed) {
+      await mockDb.deleteClient(slug);
+      await loadClients();
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -53,7 +78,9 @@ export default function AdminClientsPage() {
       parentsGroom: formData.parentsGroom,
       parentsBride: formData.parentsBride,
       themeId: formData.themeId,
-      dateStr: formData.dateStr,
+      eventDateISO: formData.eventDateISO,
+      dateStr: new Date(formData.eventDateISO).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase(),
+      status: 'Aktif',
       akad: { date: formData.akadDate, time: formData.akadTime },
       resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.resepsiVenue, address: formData.resepsiAddress }
     };
@@ -65,7 +92,7 @@ export default function AdminClientsPage() {
     // Reset
     setFormData({
       groom: "", bride: "", short: "", parentsGroom: "", parentsBride: "",
-      themeId: themesData[0].id, dateStr: "", akadDate: "", akadTime: "",
+      themeId: themesData[0].id, eventDateISO: "", akadDate: "", akadTime: "",
       resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: ""
     });
   };
@@ -73,6 +100,11 @@ export default function AdminClientsPage() {
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  const filteredClients = clients.filter(c => {
+    if (statusFilter === 'Semua') return true;
+    return (c.status || 'Aktif') === statusFilter;
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -124,8 +156,8 @@ export default function AdminClientsPage() {
               <div className="space-y-4">
                 <h3 className="font-semibold text-slate-300 text-sm">B. Data Acara</h3>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1">Tanggal Utama (Teks Besar)</label>
-                  <input required name="dateStr" value={formData.dateStr} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Contoh: 22 DESEMBER 2026" />
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Tanggal Utama Acara</label>
+                  <input required type="date" name="eventDateISO" value={formData.eventDateISO} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 focus:ring-2 focus:ring-gold/50 text-sm bg-navy-darker text-white [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -156,14 +188,26 @@ export default function AdminClientsPage() {
 
       {/* List Klien */}
       <div className="bg-white/5 rounded-3xl border border-white/10 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-white/10 flex justify-between items-center bg-transparent">
+        <div className="p-6 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-transparent gap-4">
           <h3 className="font-bold text-white flex items-center space-x-2">
             <Globe className="w-5 h-5 text-gold" />
-            <span>Klien Aktif</span>
+            <span>Daftar Semua Klien</span>
           </h3>
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input type="text" placeholder="Cari klien..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-64 bg-navy-darker text-white placeholder-slate-500" />
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 bg-navy-darker text-white w-full sm:w-auto"
+            >
+              <option value="Semua">Semua Status</option>
+              <option value="Aktif">Aktif</option>
+              <option value="Nonaktif">Nonaktif</option>
+              <option value="Diarsipkan">Diarsipkan</option>
+            </select>
+            <div className="relative w-full sm:w-auto">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input type="text" placeholder="Cari klien..." className="pl-9 pr-4 py-2 rounded-lg border border-white/10 text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 w-full sm:w-64 bg-navy-darker text-white placeholder-slate-500" />
+            </div>
           </div>
         </div>
         
@@ -176,12 +220,12 @@ export default function AdminClientsPage() {
                 <tr className="bg-white/5 text-slate-300 text-xs uppercase tracking-wider">
                   <th className="px-6 py-4 font-bold border-b border-white/10">ID / Slug</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10">Nama Mempelai</th>
-                  <th className="px-6 py-4 font-bold border-b border-white/10">Tema</th>
-                  <th className="px-6 py-4 font-bold border-b border-white/10 text-right">Aksi</th>
+                  <th className="px-6 py-4 font-bold border-b border-white/10">Status</th>
+                  <th className="px-6 py-4 font-bold border-b border-white/10 text-left">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
-                {clients.map((client) => (
+                {filteredClients.map((client) => (
                   <tr key={client.id} className="hover:bg-white/5 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-mono text-xs text-slate-400 bg-black/20 px-2 py-1 rounded inline-block">{client.id}</div>
@@ -191,18 +235,49 @@ export default function AdminClientsPage() {
                       <div className="text-xs text-slate-400">{client.dateStr}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gold/10 text-gold border border-gold/20">
-                        {client.themeId}
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                        client.status === 'Diarsipkan' ? 'bg-slate-500/10 text-slate-400 border border-slate-500/20' : 
+                        client.status === 'Nonaktif' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' :
+                        'bg-green-500/10 text-green-400 border border-green-500/20'}`}>
+                        {client.status || 'Aktif'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => handleCopyLink(client.id)}
-                        className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-white/10 text-slate-300 hover:bg-white/10 transition-colors text-xs font-semibold"
-                      >
-                        {copiedId === client.id ? <CheckCircle className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{copiedId === client.id ? 'Tersalin!' : 'Salin Link'}</span>
-                      </button>
+                    <td className="px-6 py-4 text-left whitespace-nowrap">
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleCopyLink(client.id)}
+                          disabled={client.status === 'Diarsipkan' || client.status === 'Nonaktif'}
+                          className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border text-xs font-semibold ${client.status === 'Diarsipkan' || client.status === 'Nonaktif' ? 'border-white/5 text-slate-500 cursor-not-allowed' : 'border-white/10 text-slate-300 hover:bg-white/10 transition-colors'}`}
+                          title={client.status === 'Diarsipkan' || client.status === 'Nonaktif' ? 'Undangan dinonaktifkan/diarsipkan' : 'Salin Link Undangan Publik'}
+                        >
+                          {copiedId === client.id ? <CheckCircle className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedId === client.id ? 'Tersalin!' : 'Undangan'}</span>
+                        </button>
+                        <button 
+                          onClick={() => handleCopyPortalLink(client.id)}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-gold/20 text-gold hover:bg-gold/10 transition-colors text-xs font-semibold"
+                          title="Salin Link Akses Portal Klien"
+                        >
+                          {copiedPortalId === client.id ? <CheckCircle className="w-3.5 h-3.5 text-green-500" /> : <Globe className="w-3.5 h-3.5" />}
+                          <span>{copiedPortalId === client.id ? 'Tersalin!' : 'Portal'}</span>
+                        </button>
+                        <select
+                          value={client.status || 'Aktif'}
+                          onChange={(e) => handleStatusChange(client.id, e.target.value)}
+                          className="px-2 py-1.5 border border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-gold/50 bg-navy-darker text-white text-xs font-semibold"
+                        >
+                          <option value="Aktif">Aktif</option>
+                          <option value="Nonaktif">Nonaktif</option>
+                          <option value="Diarsipkan">Arsipkan</option>
+                        </select>
+                        <button 
+                          onClick={() => handleDeleteClient(client.id)}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors text-xs font-semibold"
+                          title="Hapus Klien Permanen"
+                        >
+                          <span>Hapus</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

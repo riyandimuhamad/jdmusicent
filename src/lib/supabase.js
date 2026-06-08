@@ -22,6 +22,8 @@ let initialMockClients = [
     parentsGroom: 'Kel. Bapak X & Ibu Y',
     parentsBride: 'Kel. Bapak A & Ibu B',
     themeId: 'nasional-royal-navy-gold',
+    eventDateISO: '2026-06-18',
+    status: 'Aktif',
     dateStr: '18 JUNI 2026',
     akad: { date: 'Minggu, 18 Juni 2026', time: '08:00 WIB - Selesai' },
     resepsi: { date: 'Minggu, 18 Juni 2026', time: '11:00 WIB - Selesai', venue: 'Ballroom Hotel Mulia', address: 'Jl. Asia Afrika, Senayan, Jakarta Pusat' }
@@ -34,6 +36,8 @@ let initialMockClients = [
     parentsGroom: 'Kel. Bapak Santoso',
     parentsBride: 'Kel. Bapak Wijaya',
     themeId: 'lokal-sunda-priangan',
+    eventDateISO: '2026-08-20',
+    status: 'Aktif',
     dateStr: '20 AGUSTUS 2026',
     akad: { date: 'Minggu, 20 Agustus 2026', time: '08:00 WIB - Selesai' },
     resepsi: { date: 'Minggu, 20 Agustus 2026', time: '11:00 WIB - Selesai', venue: 'Gedung Sate', address: 'Jl. Diponegoro No.22, Bandung' }
@@ -54,12 +58,23 @@ const saveLocalClients = (data) => {
   }
 };
 
-// In-memory mock data with client_id
-let mockGuests = [
-  { id: 1, client_id: 'revi-adam', name: 'Budi Santoso', status: 'hadir', message: 'Selamat menempuh hidup baru!', created_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: 2, client_id: 'revi-adam', name: 'Siti Aminah', status: 'hadir', message: 'Semoga menjadi keluarga sakinah mawaddah warahmah.', created_at: new Date(Date.now() - 7200000).toISOString() },
-  { id: 3, client_id: 'budi-ani', name: 'Andi Pratama', status: 'tidak', message: 'Maaf belum bisa hadir, doa terbaik.', created_at: new Date(Date.now() - 86400000).toISOString() }
-];
+const getLocalGuests = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('jd_mock_guests');
+    if (saved) return JSON.parse(saved);
+  }
+  return [
+    { id: 1, client_id: 'revi-adam', name: 'Budi Santoso', status: 'hadir', message: 'Selamat menempuh hidup baru!', created_at: new Date(Date.now() - 3600000).toISOString() },
+    { id: 2, client_id: 'revi-adam', name: 'Siti Aminah', status: 'hadir', message: 'Semoga menjadi keluarga sakinah mawaddah warahmah.', created_at: new Date(Date.now() - 7200000).toISOString() },
+    { id: 3, client_id: 'budi-ani', name: 'Andi Pratama', status: 'tidak', message: 'Maaf belum bisa hadir, doa terbaik.', created_at: new Date(Date.now() - 86400000).toISOString() }
+  ];
+};
+
+const saveLocalGuests = (data) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jd_mock_guests', JSON.stringify(data));
+  }
+};
 
 // Helper to get bookings from localStorage or fallback
 const getLocalBookings = () => {
@@ -150,27 +165,51 @@ export const mockDb = {
     });
   },
 
-  // Get guests filtered by client_id
+  updateClientStatus: async (clientSlug, newStatus) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const clients = getLocalClients();
+        const updated = clients.map(c => 
+          c.id === clientSlug ? { ...c, status: newStatus } : c
+        );
+        saveLocalClients(updated);
+        resolve(true);
+      }, 300);
+    });
+  },
+
+  deleteClient: async (clientSlug) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const clients = getLocalClients();
+        const updated = clients.filter(c => c.id !== clientSlug);
+        saveLocalClients(updated);
+        resolve(true);
+      }, 300);
+    });
+  },
+
   getGuests: async (clientId) => {
     return new Promise(resolve => {
       setTimeout(() => {
-        if (!clientId) resolve([...mockGuests]); // Fallback for old calls
-        const filtered = mockGuests.filter(g => g.client_id === clientId);
+        const guests = getLocalGuests();
+        if (!clientId) resolve([...guests]); // Fallback for old calls
+        const filtered = guests.filter(g => g.client_id === clientId);
         resolve([...filtered]);
       }, 500);
     });
   },
   
-  // Add guest tied to a client
   addGuest: async (clientId, guestData) => {
     return new Promise(resolve => {
+      const guests = getLocalGuests();
       const newGuest = {
         id: Date.now(),
         client_id: clientId || 'demo',
         ...guestData,
         created_at: new Date().toISOString()
       };
-      mockGuests = [newGuest, ...mockGuests];
+      saveLocalGuests([newGuest, ...guests]);
       setTimeout(() => resolve(newGuest), 800);
     });
   },
@@ -178,7 +217,8 @@ export const mockDb = {
   getStats: async (clientId) => {
     return new Promise(resolve => {
       setTimeout(() => {
-        const filtered = clientId ? mockGuests.filter(g => g.client_id === clientId) : mockGuests;
+        const guests = getLocalGuests();
+        const filtered = clientId ? guests.filter(g => g.client_id === clientId) : guests;
         const total = filtered.length;
         const attending = filtered.filter(g => g.status === 'hadir').length;
         const absent = filtered.filter(g => g.status === 'tidak').length;
@@ -197,9 +237,10 @@ export const mockDb = {
         const clients = getLocalClients();
         const totalClients = clients.length;
         
-        const totalRsvp = mockGuests.length;
-        const attendingRsvp = mockGuests.filter(g => g.status === 'hadir').length;
-        const absentRsvp = mockGuests.filter(g => g.status === 'tidak').length;
+        const guests = getLocalGuests();
+        const totalRsvp = guests.length;
+        const attendingRsvp = guests.filter(g => g.status === 'hadir').length;
+        const absentRsvp = guests.filter(g => g.status === 'tidak').length;
 
         resolve({
           bookings: { total: totalBookings, pending: pendingBookings },
@@ -221,7 +262,7 @@ export const mockDb = {
           created_at: b.created_at
         }));
 
-        const guests = mockGuests.map(g => ({
+        const guests = getLocalGuests().map(g => ({
           id: `g_${g.id}`,
           type: 'rsvp',
           title: `RSVP ${g.status === 'hadir' ? 'Hadir' : 'Tidak Hadir'}`,

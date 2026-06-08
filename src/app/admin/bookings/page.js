@@ -24,6 +24,12 @@ export default function AdminBookingsPage() {
   };
 
   const handleStatusChange = async (id, newStatus) => {
+    const isConfirmed = window.confirm(`Apakah Anda yakin ingin mengubah status pesanan menjadi "${newStatus}"?`);
+    if (!isConfirmed) {
+      // Re-load to reset the select dropdown to its original value if canceled
+      await loadBookings();
+      return;
+    }
     await mockDb.updateBookingStatus(id, newStatus);
     await loadBookings();
   };
@@ -88,7 +94,7 @@ export default function AdminBookingsPage() {
                   <th className="px-6 py-4 font-bold border-b border-white/10">Paket & Add-on</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10">Total (Est)</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10">Status</th>
-                  <th className="px-6 py-4 font-bold border-b border-white/10 text-right">Aksi</th>
+                  <th className="px-6 py-4 font-bold border-b border-white/10 text-left">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -115,8 +121,8 @@ export default function AdminBookingsPage() {
                     <td className="px-6 py-4">
                       {renderStatusBadge(booking.status)}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
+                    <td className="px-6 py-4 text-left">
+                      <div className="flex items-center justify-start space-x-2">
                         <button 
                           onClick={() => setSelectedBooking(booking)}
                           className="inline-flex items-center space-x-1 px-3 py-1.5 rounded-lg border border-white/10 text-slate-300 hover:bg-gold/10 hover:text-gold hover:border-gold/30 transition-colors text-xs font-semibold"

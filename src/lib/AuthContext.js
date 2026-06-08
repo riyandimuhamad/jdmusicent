@@ -21,33 +21,29 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    if (!loading) {
-      // If trying to access admin routes while not logged in, redirect to login
-      if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login') && !pathname.startsWith('/admin/forgot-password')) {
-        if (!user) {
-          router.push('/admin/login');
-        }
-      }
-      
-      // If logged in and trying to access login, redirect to overview
-      if (pathname.startsWith('/admin/login') && user) {
-        router.push('/admin');
-      }
-    }
-  }, [user, loading, pathname, router]);
-
   const login = async (username, password) => {
-    const res = await mockDb.login(username, password);
-    if (res.success) {
-      setUser(res.user);
-      router.push('/admin');
-      return { success: true };
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setUser(data.user);
+        mockDb.setCurrentUser(data.user); // keep in sync with local mock
+        router.push('/admin');
+        return { success: true };
+      }
+      return { success: false, error: data.error };
+    } catch (e) {
+      return { success: false, error: 'Kesalahan jaringan' };
     }
-    return { success: false, error: res.error };
   };
 
   const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     await mockDb.logout();
     setUser(null);
     router.push('/admin/login');
