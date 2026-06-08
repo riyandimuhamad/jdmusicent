@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, HelpCircle, PhoneCall } from "lucide-react";
 import packagesData from "@/data/packages.json";
+import { mockDb } from "@/lib/supabase";
 import PackageCard from "@/components/pricelist/PackageCard";
 import DetailsModal from "@/components/pricelist/DetailsModal";
 
@@ -11,6 +12,15 @@ export default function PricelistPage() {
   const router = useRouter();
   const [selectedPkg, setSelectedPkg] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settings, setSettings] = useState(null);
+
+  React.useEffect(() => {
+    async function loadSettings() {
+      const data = await mockDb.getSettings();
+      setSettings(data);
+    }
+    loadSettings();
+  }, []);
 
   const handleShowDetails = (pkg) => {
     setSelectedPkg(pkg);
@@ -48,14 +58,21 @@ export default function PricelistPage() {
 
         {/* Packages List */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4 max-w-6xl mx-auto">
-          {packagesData.map((pkg) => (
-            <PackageCard
-              key={pkg.id}
-              pkg={pkg}
-              onShowDetails={handleShowDetails}
-              onBook={handleBook}
-            />
-          ))}
+          {packagesData.map((pkg) => {
+            const dynamicPkg = { ...pkg };
+            if (settings && settings.liveMusic[pkg.id]) {
+              dynamicPkg.price = settings.liveMusic[pkg.id].basePrice - settings.liveMusic[pkg.id].discount;
+              dynamicPkg.originalPrice = settings.liveMusic[pkg.id].basePrice;
+            }
+            return (
+              <PackageCard
+                key={dynamicPkg.id}
+                pkg={dynamicPkg}
+                onShowDetails={handleShowDetails}
+                onBook={handleBook}
+              />
+            );
+          })}
         </div>
 
         {/* Technical & Riders FAQ Notes */}

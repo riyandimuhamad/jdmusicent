@@ -77,7 +77,7 @@ export default function HeroSection() {
         >
           <Link
             href="/pricelist"
-            className="flex items-center justify-center space-x-2 w-full sm:w-auto px-10 py-4.5 rounded-2xl font-bold text-navy-dark bg-gradient-to-r from-gold to-gold-champagne hover:scale-[1.03] active:scale-[0.97] transition-all duration-500 ease-out shadow-lg shadow-gold/10 hover:shadow-gold/20"
+            className="flex items-center justify-center space-x-2 w-full sm:w-auto px-10 py-4.5 rounded-2xl font-bold text-gold bg-white/5 border border-gold/50 hover:bg-gold hover:text-navy-dark hover:border-gold hover:scale-[1.03] active:scale-[0.97] transition-all duration-500 ease-out shadow-lg shadow-gold/5 hover:shadow-gold/20 group"
           >
             <span>Eksplorasi Paket Panggung</span>
             <ArrowRight className="w-5 h-5" />

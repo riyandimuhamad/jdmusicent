@@ -112,7 +112,7 @@ const getLocalBookings = () => {
   return [
     {
       id: 1,
-      name: 'Anisa Rahmawati',
+      name: 'Azzahra Putri',
       whatsapp: '081234567890',
       date: '2026-10-15',
       venue: 'Sheraton Hotel, Lt. 2 Ballroom, Bandung',
@@ -159,7 +159,66 @@ const saveLocalUsers = (data) => {
   }
 };
 
+const defaultSettings = {
+  liveMusic: {
+    "simple-electone": { basePrice: 2000000, discount: 0 },
+    "acoustic-elegant": { basePrice: 2600000, discount: 0 },
+    "full-band-harmony": { basePrice: 3700000, discount: 0 },
+    "grand-band-prestige": { basePrice: 4000000, discount: 0 }
+  },
+  invitations: {
+    "premium": { basePrice: 150000, discount: 45000 },
+    "eksklusif": { basePrice: 200000, discount: 60000 },
+    "luxury": { basePrice: 265000, discount: 80000 }
+  }
+};
+
+const getLocalSettings = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('jd_mock_settings');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const filteredLiveMusic = Object.keys(defaultSettings.liveMusic).reduce((acc, key) => {
+        acc[key] = parsed.liveMusic?.[key] || defaultSettings.liveMusic[key];
+        return acc;
+      }, {});
+      
+      const filteredInvitations = Object.keys(defaultSettings.invitations).reduce((acc, key) => {
+        acc[key] = parsed.invitations?.[key] || defaultSettings.invitations[key];
+        return acc;
+      }, {});
+
+      return {
+        liveMusic: filteredLiveMusic,
+        invitations: filteredInvitations
+      };
+    }
+  }
+  return defaultSettings;
+};
+
+const saveLocalSettings = (data) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('jd_mock_settings', JSON.stringify(data));
+  }
+};
+
 export const mockDb = {
+  getSettings: async () => {
+    return new Promise(resolve => {
+      setTimeout(() => resolve(getLocalSettings()), 200);
+    });
+  },
+
+  updateSettings: async (newSettings) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        saveLocalSettings(newSettings);
+        resolve({ success: true });
+      }, 500);
+    });
+  },
+
   // Get specific client by slug
   getClient: async (clientSlug) => {
     return new Promise(resolve => {

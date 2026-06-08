@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Send, Globe, LogOut, CalendarDays, X } from "lucide-react";
+import { LayoutDashboard, Users, Send, Globe, LogOut, CalendarDays, X, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
 import { useSidebar } from "@/lib/SidebarContext";
@@ -26,7 +26,10 @@ export default function AdminSidebar() {
   ];
 
   if (user?.role === 'superadmin') {
-    navLinks.push({ href: "/admin/users", icon: Users, label: "Manajemen Admin" });
+    navLinks.push(
+      { href: "/admin/settings", icon: Settings, label: "Pengaturan Harga" },
+      { href: "/admin/users", icon: Users, label: "Manajemen Admin" }
+    );
   }
 
   return (

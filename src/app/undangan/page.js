@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Sparkles, Heart, FileText, MapPin, Phone, User, Calendar, Send, CheckCircle, Info, Eye, X, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import themesData from "@/data/themes.json";
+import { mockDb } from "@/lib/supabase";
 import { formatIDR, cn } from "@/lib/utils";
 
 export default function UndanganPage() {
@@ -13,6 +14,15 @@ export default function UndanganPage() {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [activeTier, setActiveTier] = useState("Semua");
   const [previewThemeId, setPreviewThemeId] = useState(null);
+  const [settings, setSettings] = useState(null);
+
+  React.useEffect(() => {
+    async function loadSettings() {
+      const data = await mockDb.getSettings();
+      setSettings(data);
+    }
+    loadSettings();
+  }, []);
 
   const categoryMap = {
     "Lokal": "Nusantara Heritage",
@@ -26,15 +36,28 @@ export default function UndanganPage() {
     return 'Luxury';
   };
 
-  const getOriginalPrice = (price) => {
-    if (price <= 115000) return 150000; // ~23% discount
-    if (price === 140000) return 200000; // ~30% discount
+  const getOriginalPrice = (theme, defaultPrice) => {
+    const tier = getThemeTier(defaultPrice).toLowerCase();
+    if (settings && settings.invitations[tier]) {
+      return settings.invitations[tier].basePrice;
+    }
+    if (defaultPrice <= 115000) return 150000; // ~23% discount
+    if (defaultPrice === 140000) return 200000; // ~30% discount
     return 265000; // ~30% discount
   };
 
-  const getDiscountPercentage = (price) => {
-    const original = getOriginalPrice(price);
-    return Math.round(((original - price) / original) * 100);
+  const getDiscountPercentage = (theme, currentPrice) => {
+    const original = getOriginalPrice(theme, currentPrice);
+    if (original <= currentPrice) return 0;
+    return Math.round(((original - currentPrice) / original) * 100);
+  };
+
+  const getDynamicPrice = (theme) => {
+    const tier = getThemeTier(theme.priceStandalone).toLowerCase();
+    if (settings && settings.invitations[tier]) {
+      return settings.invitations[tier].basePrice - settings.invitations[tier].discount;
+    }
+    return theme.priceStandalone;
   };
 
   const getThemeTitleColor = (id) => {
@@ -148,7 +171,7 @@ export default function UndanganPage() {
                 // Menghitung distribusi kasta berdasarkan Budaya yang sedang aktif
                 const count = themesData.filter(t =>
                   (activeCategory === "Semua" || t.category === activeCategory) &&
-                  (tier === "Semua" || getThemeTier(t.priceStandalone) === tier)
+                  (tier === "Semua" || getThemeTier(getDynamicPrice(t)) === tier)
                 ).length;
 
                 return (
@@ -174,7 +197,7 @@ export default function UndanganPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-8 pt-4">
             {themesData.filter(theme => {
               const matchCategory = activeCategory === "Semua" || theme.category === activeCategory;
-              const matchTier = activeTier === "Semua" || getThemeTier(theme.priceStandalone) === activeTier;
+              const matchTier = activeTier === "Semua" || getThemeTier(getDynamicPrice(theme)) === activeTier;
               return matchCategory && matchTier;
             }).map((theme) => {
               return (
@@ -187,11 +210,11 @@ export default function UndanganPage() {
                     <div className="absolute top-5 -left-10 w-40 -rotate-45 z-30 pointer-events-none">
                       <div className={cn(
                         "w-full text-center py-1.5 shadow-lg text-[9px] font-black uppercase tracking-widest",
-                        getThemeTier(theme.priceStandalone) === 'Luxury' ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]" :
-                          getThemeTier(theme.priceStandalone) === 'Eksklusif' ? "bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]" :
+                        getThemeTier(getDynamicPrice(theme)) === 'Luxury' ? "bg-purple-600 text-white shadow-[0_0_15px_rgba(147,51,234,0.4)]" :
+                          getThemeTier(getDynamicPrice(theme)) === 'Eksklusif' ? "bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]" :
                             "bg-emerald-600 text-white shadow-[0_0_15px_rgba(5,150,105,0.4)]"
                       )}>
-                        {getThemeTier(theme.priceStandalone)}
+                        {getThemeTier(getDynamicPrice(theme))}
                       </div>
                     </div>
                   )}
@@ -343,16 +366,20 @@ export default function UndanganPage() {
                       <div className="py-4 border-y border-white/5 flex flex-col space-y-1">
                         <span className="text-xs text-slate-400 font-medium">Harga Standalone:</span>
                         <div className="flex flex-col space-y-0.5 pt-1">
-                          <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
-                            {formatIDR(getOriginalPrice(pTheme.priceStandalone))}
-                          </span>
+                          {getDiscountPercentage(pTheme, getDynamicPrice(pTheme)) > 0 && (
+                            <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
+                              {formatIDR(getOriginalPrice(pTheme, pTheme.priceStandalone))}
+                            </span>
+                          )}
                           <div className="flex items-end space-x-3">
                             <span className="font-heading font-black text-3xl text-gold drop-shadow-md leading-none">
-                              {formatIDR(pTheme.priceStandalone)}
+                              {formatIDR(getDynamicPrice(pTheme))}
                             </span>
-                            <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
-                              Diskon {getDiscountPercentage(pTheme.priceStandalone)}%
-                            </span>
+                            {getDiscountPercentage(pTheme, getDynamicPrice(pTheme)) > 0 && (
+                              <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
+                                Diskon {getDiscountPercentage(pTheme, getDynamicPrice(pTheme))}%
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

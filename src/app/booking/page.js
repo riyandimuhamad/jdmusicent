@@ -39,21 +39,45 @@ function BookingFormContent() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [waUrl, setWaUrl] = useState("");
   const [activeThemeCategory, setActiveThemeCategory] = useState("Semua");
+  const [settings, setSettings] = useState(null);
+  const [claimBonus, setClaimBonus] = useState(false);
+
+  useEffect(() => {
+    async function loadSettings() {
+      const data = await mockDb.getSettings();
+      setSettings(data);
+    }
+    loadSettings();
+  }, []);
 
   // Derived Values
   const selectedPackage = packagesData.find((p) => p.id === selectedPackageId) || null;
   const selectedTheme = themesData.find((t) => t.id === selectedThemeId) || themesData[0];
 
-  const packagePrice = selectedPackage ? selectedPackage.price : 0;
+  const packagePrice = selectedPackage && settings 
+    ? (settings.liveMusic[selectedPackage.id]?.basePrice || selectedPackage.price) - (settings.liveMusic[selectedPackage.id]?.discount || 0)
+    : (selectedPackage ? selectedPackage.price : 0);
   
-  // Rule: Addon has standard discount when bundled, or is free if Premium package
+  const originalPackagePrice = selectedPackage && settings
+    ? (settings.liveMusic[selectedPackage.id]?.basePrice || selectedPackage.originalPrice)
+    : (selectedPackage ? selectedPackage.originalPrice : 0);
+
+  const themeAddonPrice = selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()]
+    ? (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice || selectedTheme.priceAddon) - (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount || 0)
+    : (selectedTheme ? selectedTheme.priceAddon : 0);
+
+  const themeOriginalPrice = selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()]
+    ? (settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice || selectedTheme.priceStandalone)
+    : (selectedTheme ? selectedTheme.priceStandalone : 0);
+
+  // Rule: Addon has standard discount when bundled, or is free if Premium package AND they opt-in
   const isPremiumPackage = selectedPackage?.id === "premium" || selectedPackage?.id === "grand-band-prestige"; // Adapting if ID is different
-  const addonPrice = isPremiumPackage 
+  const addonPrice = isPremiumPackage && claimBonus
     ? 0 
-    : (isAddonChecked ? selectedTheme.priceAddon : 0);
+    : ((isAddonChecked || claimBonus) ? themeAddonPrice : 0);
 
   const totalPrice = packagePrice + addonPrice;
-  const originalTotalPrice = (selectedPackage ? selectedPackage.originalPrice : 0) + (isAddonChecked ? selectedTheme.priceStandalone : 0);
+  const originalTotalPrice = originalPackagePrice + ((isAddonChecked || claimBonus) ? themeOriginalPrice : 0);
   const totalSavings = originalTotalPrice > totalPrice ? originalTotalPrice - totalPrice : 0;
 
   // Validation
@@ -100,7 +124,10 @@ function BookingFormContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -194,7 +221,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Input Form Fields */}
-          <form onSubmit={handleSubmit} className="lg:col-span-7 space-y-8 glass-card p-6 sm:p-8 rounded-3xl border border-white/5 shadow-xl">
+          <form onSubmit={handleSubmit} autoComplete="off" className="lg:col-span-7 space-y-8 glass-card p-6 sm:p-8 rounded-3xl border border-white/5 shadow-xl">
             
             {/* Section 1: Client Bio details */}
             <div className="space-y-4">
@@ -213,7 +240,8 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                   name="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  placeholder="Contoh: Anisa Rahmawati"
+                  placeholder="Contoh: Azzahra Putri"
+                  autoComplete="new-password"
                   className={cn(
                     "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
                     errors.name ? "border-red-500/50" : "border-white/10"
@@ -234,6 +262,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                   value={formData.whatsapp}
                   onChange={handleInputChange}
                   placeholder="Contoh: 081234567890"
+                  autoComplete="new-password"
                   className={cn(
                     "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
                     errors.whatsapp ? "border-red-500/50" : "border-white/10"
@@ -280,6 +309,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                   value={formData.venue}
                   onChange={handleInputChange}
                   placeholder="Contoh: Sheraton Hotel, Lt. 2 Ballroom, Bandung"
+                  autoComplete="new-password"
                   className={cn(
                     "w-full px-4 py-3 rounded-xl bg-white/5 border text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
                     errors.venue ? "border-red-500/50" : "border-white/10"
@@ -310,11 +340,16 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                   )}
                 >
                   <option value="" disabled>-- Pilih Paket Musik Utama Anda --</option>
-                  {packagesData.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} - {formatIDR(p.price)}
-                    </option>
-                  ))}
+                  {packagesData.map((p) => {
+                    const price = settings && settings.liveMusic[p.id] 
+                      ? settings.liveMusic[p.id].basePrice - settings.liveMusic[p.id].discount
+                      : p.price;
+                    return (
+                      <option key={p.id} value={p.id}>
+                        {p.name} - {formatIDR(price)}
+                      </option>
+                    );
+                  })}
                 </select>
                 {errors.package && <p className="text-xs text-red-400 pl-1 mt-1">{errors.package}</p>}
               </div>
@@ -322,48 +357,33 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
               {/* Checkbox selector addon */}
               <div className="pt-2">
                 {isPremiumPackage ? (
-                  // Premium Package free bundle info
-                  <div className="flex items-start space-x-3 p-4 rounded-xl bg-gold/10 border border-gold/30">
-                    <Gift className="w-5 h-5 text-gold flex-shrink-0 mt-0.5 animate-bounce" />
-                    <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-gold">FREE Premium Bundling Undangan Digital!</h4>
-                      <p className="text-xs text-slate-300 leading-normal mt-0.5">
-                        Paket Premium sudah termasuk lisensi Undangan Digital Premium dengan request kustom tema bebas secara gratis (Hemat Rp 350.000).
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  // Standard addon checkbox
+                  // Premium Package opt-in bundle info
                   <div className="space-y-4">
-                    <label className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-gold/30 cursor-pointer transition-colors">
+                    <label className="flex items-start space-x-3 p-4 rounded-xl bg-gold/10 border border-gold/30 cursor-pointer hover:bg-gold/20 transition-colors">
                       <input
                         type="checkbox"
-                        checked={isAddonChecked}
-                        onChange={(e) => setIsAddonChecked(e.target.checked)}
-                        className="w-4.5 h-4.5 rounded border-white/20 accent-gold"
+                        checked={claimBonus}
+                        onChange={(e) => setClaimBonus(e.target.checked)}
+                        className="w-4.5 h-4.5 rounded border-white/20 accent-gold mt-1"
                       />
                       <div className="flex-grow select-none">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-xs sm:text-sm font-bold text-white">Tambahkan Undangan Digital</span>
-                            <span className="text-[9px] font-extrabold uppercase bg-gold/15 text-gold px-1.5 py-0.5 rounded tracking-wider whitespace-nowrap">Bundling Promo</span>
+                            <span className="text-xs sm:text-sm font-bold text-gold">Klaim Bonus Undangan Digital Gratis!</span>
+                            <span className="text-[9px] font-extrabold uppercase bg-gold/20 text-gold px-1.5 py-0.5 rounded tracking-wider whitespace-nowrap">Bonus Eksklusif</span>
                           </div>
-                          <span className="text-xs font-bold text-gold whitespace-nowrap">
-                            {isAddonChecked ? `+ ${formatIDR(selectedTheme.priceAddon)}` : "Mulai dari + Rp 105.000"}
+                          <span className="text-xs font-bold text-green-400 whitespace-nowrap">
+                            GRATIS (Rp 0)
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 mt-1 leading-normal">
-                          {isAddonChecked ? (
-                            <>Dapatkan Harga Spesial Bundling. Anda berhemat <span className="text-white font-semibold">{formatIDR(selectedTheme.priceStandalone - selectedTheme.priceAddon)}</span> untuk tema <span className="text-gold font-semibold">{selectedTheme.name}</span>.</>
-                          ) : (
-                            "Centang untuk memilih desain. Dapatkan harga spesial khusus pemesanan beserta paket musik."
-                          )}
+                        <p className="text-xs text-slate-300 leading-normal mt-1.5">
+                          Centang untuk mengambil lisensi Undangan Digital Premium Anda (Hemat Rp 350.000). Anda dapat memilih desain dan kustomisasi sesuai keinginan.
                         </p>
                       </div>
                     </label>
 
                     {/* Show theme selector if checked */}
-                    {isAddonChecked && (
+                    {claimBonus && (
                       <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4 animate-fade-in">
                         <div className="flex flex-col space-y-3">
                           <label className="text-xs sm:text-sm font-semibold text-slate-300">Pilih Desain Tema Undangan</label>
@@ -386,7 +406,12 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                           </div>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                          {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => (
+                          {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => {
+                            const tier = getThemeTier(theme.priceStandalone).toLowerCase();
+                            const addonPrice = settings && settings.invitations[tier]
+                              ? settings.invitations[tier].basePrice - settings.invitations[tier].discount
+                              : theme.priceAddon;
+                            return (
                             <div
                               key={theme.id}
                               onClick={() => setSelectedThemeId(theme.id)}
@@ -397,6 +422,7 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                                   : "bg-white/[0.01] hover:bg-white/[0.03] hover:-translate-y-1"
                               )}
                             >
+
                               {/* Image Cover */}
                               <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
                                 {/* Dynamic CSS Mockup */}
@@ -440,12 +466,118 @@ Apakah jadwal di tanggal tersebut masih tersedia? Terima kasih!`;
                                     {theme.name}
                                   </h4>
                                   <div className="mt-1 flex items-center justify-between text-[10px] font-semibold">
-                                    <span className="text-gold">{formatIDR(theme.priceAddon)}</span>
+                                    <span className="text-gold">GRATIS (Rp 0)</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Standard addon checkbox
+                  <div className="space-y-4">
+                    <label className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-gold/30 cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={isAddonChecked}
+                        onChange={(e) => setIsAddonChecked(e.target.checked)}
+                        className="w-4.5 h-4.5 rounded border-white/20 accent-gold"
+                      />
+                      <div className="flex-grow select-none">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-xs sm:text-sm font-bold text-white">Tambahkan Undangan Digital</span>
+                            <span className="text-[9px] font-extrabold uppercase bg-gold/15 text-gold px-1.5 py-0.5 rounded tracking-wider whitespace-nowrap">Bundling Promo</span>
+                          </div>
+                          <span className="text-xs font-bold text-gold whitespace-nowrap">
+                            {isAddonChecked && selectedTheme && settings && settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()] ? `+ ${formatIDR(settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].basePrice - settings.invitations[getThemeTier(selectedTheme.priceStandalone).toLowerCase()].discount)}` : "Mulai dari + Rp 105.000"}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1 leading-normal">
+                          {isAddonChecked ? (
+                            <>Dapatkan Harga Spesial Bundling untuk tema <span className="text-gold font-semibold">{selectedTheme.name}</span>.</>
+                          ) : (
+                            "Centang untuk memilih desain. Dapatkan harga spesial khusus pemesanan beserta paket musik."
+                          )}
+                        </p>
+                      </div>
+                    </label>
+
+                    {/* Show theme selector if checked */}
+                    {isAddonChecked && (
+                      <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4 animate-fade-in">
+                        <div className="flex flex-col space-y-3">
+                          <label className="text-xs sm:text-sm font-semibold text-slate-300">Pilih Desain Tema Undangan</label>
+                          <div className="flex flex-wrap gap-2">
+                            {["Semua", "Premium", "Eksklusif", "Luxury"].map((cat) => (
+                              <button
+                                key={cat}
+                                type="button"
+                                onClick={(e) => { e.preventDefault(); setActiveThemeCategory(cat); }}
+                                className={cn(
+                                  "px-4 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all",
+                                  activeThemeCategory === cat
+                                    ? "bg-gold text-navy-dark"
+                                    : "bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
+                                )}
+                              >
+                                {cat}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                          {themesData.filter(theme => activeThemeCategory === "Semua" || getThemeTier(theme.priceStandalone) === activeThemeCategory).map((theme) => {
+                            const tier = getThemeTier(theme.priceStandalone).toLowerCase();
+                            const addonPrice = settings && settings.invitations[tier]
+                              ? settings.invitations[tier].basePrice - settings.invitations[tier].discount
+                              : theme.priceAddon;
+                            const stdPrice = settings && settings.invitations[tier]
+                              ? settings.invitations[tier].basePrice
+                              : theme.priceStandalone;
+                            return (
+                            <div
+                              key={theme.id}
+                              onClick={() => setSelectedThemeId(theme.id)}
+                              className={cn(
+                                "relative flex flex-col rounded-xl overflow-hidden cursor-pointer transition-all duration-300",
+                                selectedThemeId === theme.id
+                                  ? "ring-2 ring-gold shadow-[0_0_15px_rgba(212,175,55,0.2)] bg-navy-darker"
+                                  : "bg-white/[0.01] hover:bg-white/[0.03] hover:-translate-y-1"
+                              )}
+                            >
+                              <div className="relative w-full aspect-[4/5] bg-navy-darker overflow-hidden">
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-4 transition-transform duration-500 hover:scale-105" style={{ backgroundColor: theme.colors[0], borderColor: theme.colors[1] || 'rgba(255,255,255,0.1)' }}>
+                                  <div className="w-12 h-12 rounded-full border-[2px] border-dashed mb-4 opacity-60 flex items-center justify-center" style={{ borderColor: theme.colors[2] }}>
+                                     <div className="w-6 h-6 rounded-full opacity-40" style={{ backgroundColor: theme.colors[2] }} />
+                                  </div>
+                                  <div className="w-3/4 h-2 rounded-full mb-2 opacity-80" style={{ backgroundColor: theme.colors[3] }} />
+                                  <div className="w-1/2 h-1.5 rounded-full mb-6 opacity-50" style={{ backgroundColor: theme.colors[3] }} />
+                                  <div className="w-full max-w-[100px] h-6 rounded-full opacity-90 shadow-md mb-8" style={{ backgroundColor: theme.colors[2] }} />
+                                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent mix-blend-overlay" />
+                                </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-navy-darker via-navy-darker/40 to-transparent opacity-90" />
+                                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 flex flex-col z-10">
+                                  <div className="flex justify-between items-end mb-1">
+                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gold">{getThemeTier(stdPrice)}</span>
+                                    {selectedThemeId === theme.id && <CheckCircle className="w-3.5 h-3.5 text-gold" />}
+                                  </div>
+                                  <div className="flex justify-between items-end">
+                                    <span className="text-xs sm:text-sm font-bold text-white">{theme.name}</span>
+                                    <div className="flex flex-col items-end">
+                                      <span className="text-[9px] text-slate-400 line-through">{formatIDR(stdPrice)}</span>
+                                      <span className="text-xs sm:text-sm font-black text-gold">{formatIDR(addonPrice)}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}

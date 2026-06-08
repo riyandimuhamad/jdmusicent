@@ -8,15 +8,34 @@ import themesData from "@/data/themes.json";
 import { formatIDR, cn } from "@/lib/utils";
 import { mockDb } from "@/lib/supabase";
 
-const getOriginalPrice = (price) => {
-  if (price <= 115000) return 150000;
-  if (price === 140000) return 200000;
+const getThemeTier = (price) => {
+  if (price <= 115000) return 'Premium';
+  if (price === 140000) return 'Eksklusif';
+  return 'Luxury';
+};
+
+const getOriginalPrice = (theme, defaultPrice, settings) => {
+  const tier = getThemeTier(defaultPrice).toLowerCase();
+  if (settings && settings.invitations[tier]) {
+    return settings.invitations[tier].basePrice;
+  }
+  if (defaultPrice <= 115000) return 150000;
+  if (defaultPrice === 140000) return 200000;
   return 265000;
 };
 
-const getDiscountPercentage = (price) => {
-  const original = getOriginalPrice(price);
-  return Math.round(((original - price) / original) * 100);
+const getDiscountPercentage = (theme, currentPrice, settings) => {
+  const original = getOriginalPrice(theme, currentPrice, settings);
+  if (original <= currentPrice) return 0;
+  return Math.round(((original - currentPrice) / original) * 100);
+};
+
+const getDynamicPrice = (theme, settings) => {
+  const tier = getThemeTier(theme.priceStandalone).toLowerCase();
+  if (settings && settings.invitations[tier]) {
+    return settings.invitations[tier].basePrice - settings.invitations[tier].discount;
+  }
+  return theme.priceStandalone;
 };
 
 function BookingUndanganContent() {
@@ -55,6 +74,15 @@ function BookingUndanganContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [waUrl, setWaUrl] = useState("");
+  const [settings, setSettings] = useState(null);
+
+  React.useEffect(() => {
+    async function loadSettings() {
+      const data = await mockDb.getSettings();
+      setSettings(data);
+    }
+    loadSettings();
+  }, []);
 
   const selectedTheme = themesData.find((t) => t.id === selectedThemeId) || themesData[0];
 
@@ -138,7 +166,7 @@ Atas Nama      : ${formData.bankAccountName || "-"}
 *Catatan Khusus*: 
 ${formData.notes.trim() || "-"}
 
-Total Harga    : ${formatIDR(selectedTheme.priceStandalone)}
+Total Harga    : ${formatIDR(getDynamicPrice(selectedTheme, settings))}
 
 Tolong bantu proses undangan saya ya. Terima kasih!`;
 
@@ -318,7 +346,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                       name="groomName"
                       value={formData.groomName}
                       onChange={handleInputChange}
-                      placeholder="Contoh: Adam Alamsyah, S.T."
+                      placeholder="Contoh: B.J. Habibie"
                       className={cn(
                         "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
                         errors.groomName ? "border-red-500/50" : "border-white/10"
@@ -333,7 +361,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                       name="groomNameShort"
                       value={formData.groomNameShort}
                       onChange={handleInputChange}
-                      placeholder="Contoh: Adam"
+                      placeholder="Contoh: Habibie"
                       className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
@@ -352,7 +380,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                       name="brideName"
                       value={formData.brideName}
                       onChange={handleInputChange}
-                      placeholder="Contoh: Revi Amalia, S.Ak."
+                      placeholder="Contoh: Hasri Ainun Besari"
                       className={cn(
                         "w-full px-4 py-2.5 rounded-lg bg-white/5 border text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors",
                         errors.brideName ? "border-red-500/50" : "border-white/10"
@@ -367,7 +395,7 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
                       name="brideNameShort"
                       value={formData.brideNameShort}
                       onChange={handleInputChange}
-                      placeholder="Contoh: Revi"
+                      placeholder="Contoh: Ainun"
                       className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
@@ -576,16 +604,20 @@ Tolong bantu proses undangan saya ya. Terima kasih!`;
               <div className="space-y-1 text-center sm:text-left">
                 <span className="text-xs text-slate-400 font-medium">Total Harga Standalone:</span>
                 <div className="flex flex-col items-center sm:items-start space-y-0.5 pt-1">
-                  <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
-                    {formatIDR(getOriginalPrice(selectedTheme.priceStandalone))}
-                  </span>
+                  {getDiscountPercentage(selectedTheme.id, getDynamicPrice(selectedTheme, settings), settings) > 0 && (
+                    <span className="text-sm font-bold text-slate-400 line-through decoration-red-500 decoration-2 mb-1">
+                      {formatIDR(getOriginalPrice(selectedTheme.id, selectedTheme.priceStandalone, settings))}
+                    </span>
+                  )}
                   <div className="flex items-end space-x-3">
                     <span className="font-heading font-black text-3xl text-gold drop-shadow-md leading-none">
-                      {formatIDR(selectedTheme.priceStandalone)}
+                      {formatIDR(getDynamicPrice(selectedTheme, settings))}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
-                      Diskon {getDiscountPercentage(selectedTheme.priceStandalone)}%
-                    </span>
+                    {getDiscountPercentage(selectedTheme.id, getDynamicPrice(selectedTheme, settings), settings) > 0 && (
+                      <span className="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-red-500 text-white mb-0.5 shadow-sm">
+                        Diskon {getDiscountPercentage(selectedTheme.id, getDynamicPrice(selectedTheme, settings), settings)}%
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

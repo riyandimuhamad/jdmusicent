@@ -132,7 +132,7 @@ export default function ClientPortal() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pr-0 sm:pr-8">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4">
         <div>
           <h1 className="font-heading font-black text-3xl text-white">Dashboard Pernikahan</h1>
           <p className="text-slate-400 mt-1">Selamat datang, {clientData.short}. Kelola tamu dan pantau kehadiran undangan Anda.</p>
