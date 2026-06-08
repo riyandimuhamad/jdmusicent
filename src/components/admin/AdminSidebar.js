@@ -25,7 +25,8 @@ export default function AdminSidebar() {
     { href: "/admin/broadcast", icon: Send, label: "WA Broadcast" },
   ];
 
-  if (user?.role === 'superadmin') {
+  // Superadmin or the primary 'admin' account always gets access
+  if (user?.role === 'superadmin' || user?.username === 'admin') {
     navLinks.push(
       { href: "/admin/settings", icon: Settings, label: "Pengaturan Harga" },
       { href: "/admin/users", icon: Users, label: "Manajemen Admin" }

@@ -5,7 +5,7 @@ import { AuthProvider } from "@/lib/AuthContext";
 import { SidebarProvider } from "@/lib/SidebarContext";
 
 export const metadata = {
-  title: "Admin Dashboard | JD Music",
+  title: "Admin Dashboard",
   description: "SaaS Admin Dashboard for Managing Invitations",
 };
 
