@@ -23,28 +23,30 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+      const res = await mockDb.login(username, password);
       
-      if (data.success) {
-        setUser(data.user);
-        mockDb.setCurrentUser(data.user); // keep in sync with local mock
+      if (res.success) {
+        setUser(res.user);
+        // Set an HTTP-only cookie via a simple API call so Next.js middleware works
+        await fetch('/api/auth/login-cookie', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: 'dummy-token' })
+        });
+        
         router.push('/admin');
         return { success: true };
       }
-      return { success: false, error: data.error };
+      return { success: false, error: res.error };
     } catch (e) {
-      return { success: false, error: 'Kesalahan jaringan' };
+      console.error('Login error:', e);
+      return { success: false, error: 'Kesalahan jaringan atau server.' };
     }
   };
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    await mockDb.logout();
+    await fetch('/api/auth/logout', { method: 'POST' }); // clear cookie
+    await mockDb.logout(); // clear local storage
     setUser(null);
     router.push('/admin/login');
   };
