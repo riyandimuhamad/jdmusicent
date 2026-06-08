@@ -63,6 +63,18 @@ export const mockDb = {
     return true;
   },
 
+  uploadFile: async (file, path) => {
+    const { data, error } = await supabase.storage.from('galleries').upload(path, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+    if (error) throw error;
+    
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage.from('galleries').getPublicUrl(path);
+    return publicUrlData.publicUrl;
+  },
+
   deleteClient: async (clientSlug) => {
     const { error } = await supabase.from('clients').delete().eq('id', clientSlug);
     if (error) throw error;
