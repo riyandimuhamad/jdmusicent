@@ -12,6 +12,7 @@ export default function AdminClientsPage() {
   const [statusFilter, setStatusFilter] = useState('Semua');
   const [copiedId, setCopiedId] = useState(null);
   const [copiedPortalId, setCopiedPortalId] = useState(null);
+  const [copiedPinId, setCopiedPinId] = useState(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -20,7 +21,9 @@ export default function AdminClientsPage() {
     themeId: themesData[0].id,
     eventDateISO: "", // Store the actual YYYY-MM-DD
     akadDate: "", akadTime: "",
-    resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: ""
+    resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: "",
+    gallery1: "", gallery2: "", bgmUrl: "",
+    bank: "", account: "", accountName: ""
   });
 
   useEffect(() => {
@@ -46,6 +49,12 @@ export default function AdminClientsPage() {
     navigator.clipboard.writeText(link);
     setCopiedPortalId(slug);
     setTimeout(() => setCopiedPortalId(null), 2000);
+  };
+
+  const handleCopyPin = (slug, pin) => {
+    navigator.clipboard.writeText(pin);
+    setCopiedPinId(slug);
+    setTimeout(() => setCopiedPinId(null), 2000);
   };
 
   const handleStatusChange = async (slug, newStatus) => {
@@ -82,7 +91,16 @@ export default function AdminClientsPage() {
       dateStr: new Date(formData.eventDateISO).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase(),
       status: 'Aktif',
       akad: { date: formData.akadDate, time: formData.akadTime },
-      resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.resepsiVenue, address: formData.resepsiAddress }
+      resepsi: { date: formData.resepsiDate, time: formData.resepsiTime, venue: formData.resepsiVenue, address: formData.resepsiAddress },
+      assets: {
+        gallery: [formData.gallery1, formData.gallery2].filter(Boolean),
+        bgmUrl: formData.bgmUrl
+      },
+      gift: {
+        bank: formData.bank,
+        account: formData.account,
+        name: formData.accountName
+      }
     };
 
     await mockDb.addClient(newClient);
@@ -93,7 +111,8 @@ export default function AdminClientsPage() {
     setFormData({
       groom: "", bride: "", short: "", parentsGroom: "", parentsBride: "",
       themeId: themesData[0].id, eventDateISO: "", akadDate: "", akadTime: "",
-      resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: ""
+      resepsiDate: "", resepsiTime: "", resepsiVenue: "", resepsiAddress: "",
+      gallery1: "", gallery2: "", bgmUrl: "", bank: "", account: "", accountName: ""
     });
   };
 
@@ -175,6 +194,44 @@ export default function AdminClientsPage() {
                 </div>
               </div>
 
+              {/* Aset & Media */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-slate-300 text-sm">C. Aset & Media (Opsional)</h3>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">URL Musik Latar (BGM MP3)</label>
+                  <input name="bgmUrl" value={formData.bgmUrl} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://contoh.com/lagu.mp3" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">URL Foto Galeri 1</label>
+                    <input name="gallery1" value={formData.gallery1} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">URL Foto Galeri 2</label>
+                    <input name="gallery2" value={formData.gallery2} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="https://..." />
+                  </div>
+                </div>
+              </div>
+
+              {/* Angpao / Gift */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-slate-300 text-sm">D. Angpao / Gift (Opsional)</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">Nama Bank / e-Wallet</label>
+                    <input name="bank" value={formData.bank} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="BCA / GoPay" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-1">Nomor Rekening</label>
+                    <input name="account" value={formData.account} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="1234567890" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Atas Nama</label>
+                  <input name="accountName" value={formData.accountName} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border border-white/10 text-sm bg-navy-darker text-white placeholder-slate-500" placeholder="Dilan Saputra" />
+                </div>
+              </div>
+
             </div>
             
             <div className="border-t border-white/10 pt-6 flex justify-end">
@@ -220,6 +277,7 @@ export default function AdminClientsPage() {
                 <tr className="bg-white/5 text-slate-300 text-xs uppercase tracking-wider">
                   <th className="px-6 py-4 font-bold border-b border-white/10">ID / Slug</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10">Nama Mempelai</th>
+                  <th className="px-6 py-4 font-bold border-b border-white/10">PIN Portal</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10">Status</th>
                   <th className="px-6 py-4 font-bold border-b border-white/10 text-left">Aksi</th>
                 </tr>
@@ -233,6 +291,20 @@ export default function AdminClientsPage() {
                     <td className="px-6 py-4">
                       <div className="font-bold text-white text-sm">{client.short}</div>
                       <div className="text-xs text-slate-400">{client.dateStr}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="font-mono text-sm tracking-widest text-gold bg-gold/10 px-3 py-1.5 rounded-lg inline-block font-bold">
+                          {client.pin || '------'}
+                        </div>
+                        <button 
+                          onClick={() => handleCopyPin(client.id, client.pin)}
+                          className="p-1.5 rounded-lg border border-white/10 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                          title="Salin PIN"
+                        >
+                          {copiedPinId === client.id ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${

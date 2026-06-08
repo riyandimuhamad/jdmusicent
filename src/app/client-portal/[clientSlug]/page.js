@@ -13,6 +13,12 @@ export default function ClientPortal() {
   const [guests, setGuests] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pinInput, setPinInput] = useState("");
+  const [error, setError] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  
   // Link Generator State
   const [guestName, setGuestName] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
@@ -29,6 +35,12 @@ export default function ClientPortal() {
       setLoading(false);
     }
     loadData();
+
+    // Check existing session
+    const authData = localStorage.getItem(`portal_auth_${clientSlug}`);
+    if (authData === 'true') {
+      setIsAuthenticated(true);
+    }
   }, [clientSlug]);
 
   const handleGenerateLink = (e) => {
@@ -47,6 +59,27 @@ export default function ClientPortal() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (clientData.pin && pinInput.trim() === String(clientData.pin).trim()) {
+      setLoginSuccess(true);
+      setError("");
+      setTimeout(() => {
+        localStorage.setItem(`portal_auth_${clientSlug}`, 'true');
+        setIsAuthenticated(true);
+      }, 1500);
+    } else {
+      setError("PIN yang Anda masukkan salah.");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(`portal_auth_${clientSlug}`);
+    setIsAuthenticated(false);
+    setPinInput("");
+    setLoginSuccess(false);
+  };
+
   if (loading) return <div className="text-center py-20 animate-pulse text-slate-400">Memuat Portal Klien...</div>;
 
   if (!clientData) {
@@ -56,11 +89,57 @@ export default function ClientPortal() {
   const attendingCount = guests.filter(g => g.status === 'hadir').length;
   const absentCount = guests.filter(g => g.status === 'tidak').length;
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center animate-in fade-in zoom-in-95 duration-500">
+        <div className="bg-white/5 p-8 rounded-3xl border border-white/10 shadow-lg max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-gold/10 text-gold rounded-full flex items-center justify-center mx-auto mb-6">
+            <UserCheck className="w-8 h-8" />
+          </div>
+          <h1 className="font-heading font-black text-2xl text-white mb-2">Portal Klien Terkunci</h1>
+          <p className="text-slate-400 text-sm mb-8">Silakan masukkan PIN keamanan 6-digit yang diberikan oleh Admin untuk mengakses data Anda.</p>
+          
+          {loginSuccess ? (
+            <div className="py-6 flex flex-col items-center justify-center animate-in zoom-in duration-300">
+              <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+              <p className="text-white font-bold text-lg">Akses Disetujui!</p>
+              <p className="text-slate-400 text-sm mt-1 animate-pulse">Membuka Portal Klien...</p>
+            </div>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-4 text-left">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">PIN Portal Klien</label>
+                <input 
+                  type="password" 
+                  maxLength="6"
+                  value={pinInput} 
+                  onChange={(e) => setPinInput(e.target.value)} 
+                  placeholder="••••••" 
+                  className="w-full px-4 py-3 rounded-xl border border-white/10 bg-black/20 text-white text-center text-2xl tracking-[0.5em] pl-[calc(1rem+0.5em)] focus:outline-none focus:ring-2 focus:ring-gold/50"
+                  required
+                />
+              </div>
+              {error && <p className="text-red-400 text-xs text-center font-bold">{error}</p>}
+              <button type="submit" className="w-full py-3 rounded-xl bg-gradient-to-r from-gold to-yellow-500 text-navy-dark font-bold tracking-wide text-sm hover:from-yellow-600 hover:to-gold transition-all shadow-md mt-4">
+                Akses Portal
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div>
-        <h1 className="font-heading font-black text-3xl text-white">Dashboard Pernikahan</h1>
-        <p className="text-slate-400 mt-1">Selamat datang, {clientData.short}. Kelola tamu dan pantau kehadiran undangan Anda.</p>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pr-0 sm:pr-8">
+        <div>
+          <h1 className="font-heading font-black text-3xl text-white">Dashboard Pernikahan</h1>
+          <p className="text-slate-400 mt-1">Selamat datang, {clientData.short}. Kelola tamu dan pantau kehadiran undangan Anda.</p>
+        </div>
+        <button onClick={handleLogout} className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors text-xs font-bold">
+          Keluar (Logout)
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

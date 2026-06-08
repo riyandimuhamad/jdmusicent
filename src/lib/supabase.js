@@ -24,9 +24,19 @@ let initialMockClients = [
     themeId: 'nasional-royal-navy-gold',
     eventDateISO: '2026-06-18',
     status: 'Aktif',
+    pin: '123456',
     dateStr: '18 JUNI 2026',
     akad: { date: 'Minggu, 18 Juni 2026', time: '08:00 WIB - Selesai' },
-    resepsi: { date: 'Minggu, 18 Juni 2026', time: '11:00 WIB - Selesai', venue: 'Ballroom Hotel Mulia', address: 'Jl. Asia Afrika, Senayan, Jakarta Pusat' }
+    resepsi: { date: 'Minggu, 18 Juni 2026', time: '11:00 WIB - Selesai', venue: 'Ballroom Hotel Mulia', address: 'Jl. Asia Afrika, Senayan, Jakarta Pusat' },
+    assets: {
+      gallery: ['https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000', 'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000'],
+      bgmUrl: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_8e8a605f6e.mp3'
+    },
+    gift: {
+      bank: 'BCA',
+      account: '1234567890',
+      name: 'Adam Wijaya'
+    }
   },
   { 
     id: 'budi-ani', 
@@ -38,16 +48,33 @@ let initialMockClients = [
     themeId: 'lokal-sunda-priangan',
     eventDateISO: '2026-08-20',
     status: 'Aktif',
+    pin: '654321',
     dateStr: '20 AGUSTUS 2026',
     akad: { date: 'Minggu, 20 Agustus 2026', time: '08:00 WIB - Selesai' },
-    resepsi: { date: 'Minggu, 20 Agustus 2026', time: '11:00 WIB - Selesai', venue: 'Gedung Sate', address: 'Jl. Diponegoro No.22, Bandung' }
+    resepsi: { date: 'Minggu, 20 Agustus 2026', time: '11:00 WIB - Selesai', venue: 'Gedung Sate', address: 'Jl. Diponegoro No.22, Bandung' },
+    assets: { gallery: [], bgmUrl: '' },
+    gift: { bank: '', account: '', name: '' }
   }
 ];
 
 const getLocalClients = () => {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('jd_mock_clients');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      let parsed = JSON.parse(saved);
+      let needsSave = false;
+      parsed = parsed.map(c => {
+        if (!c.pin) {
+          needsSave = true;
+          return { ...c, pin: Math.floor(100000 + Math.random() * 900000).toString() };
+        }
+        return c;
+      });
+      if (needsSave) {
+        localStorage.setItem('jd_mock_clients', JSON.stringify(parsed));
+      }
+      return parsed;
+    }
   }
   return initialMockClients;
 };
@@ -158,7 +185,8 @@ export const mockDb = {
     return new Promise(resolve => {
       setTimeout(() => {
         const clients = getLocalClients();
-        const newClient = { ...clientData };
+        const pin = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit PIN
+        const newClient = { ...clientData, pin };
         saveLocalClients([newClient, ...clients]);
         resolve(newClient);
       }, 500);
