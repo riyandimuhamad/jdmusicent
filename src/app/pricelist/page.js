@@ -76,39 +76,91 @@ export default function PricelistPage() {
         </div>
 
         {/* Technical & Riders FAQ Notes */}
-        <div className="max-w-3xl mx-auto p-6 sm:p-8 rounded-3xl glass-card border border-white/5 space-y-6">
-          <div className="flex items-center space-x-3 text-gold">
-            <HelpCircle className="w-5 h-5" />
-            <h3 className="font-heading font-bold text-base sm:text-lg">Catatan Penting Pemesanan (Riders & Teknis)</h3>
-          </div>
-          <ul className="space-y-3 text-xs sm:text-sm text-slate-300 pl-1 list-disc list-inside">
-            <li>
-              <strong className="text-white">Pemesanan Minimal H-14:</strong> Memudahkan musisi kami berlatih lagu pilihan khusus Anda.
-            </li>
-            <li>
-              <strong className="text-white">Uang Muka (DP):</strong> Pemesanan dianggap sah setelah melakukan pembayaran DP minimal 30% dari total biaya paket.
-            </li>
-            <li>
-              <strong className="text-white">Kebutuhan Sound System:</strong> Sound system panggung disediakan oleh kami lengkap dengan operator suara berlisensi.
-            </li>
-            <li>
-              <strong className="text-white">Transportasi & Akomodasi:</strong> Biaya sudah termasuk wilayah Bandung. Di luar kota Bandung dikenakan tambahan biaya bensin/akomodasi wajar.
-            </li>
-          </ul>
+        <div className="max-w-6xl mx-auto p-8 lg:p-10 rounded-3xl bg-gradient-to-br from-slate-900/80 to-navy-darker/80 backdrop-blur-md border border-white/5 shadow-2xl relative overflow-hidden group">
+          {/* Subtle Decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-gold/10 transition-colors duration-700" />
+          
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 relative z-10">
+            {/* Left Column: Header & CTA */}
+            <div className="lg:w-1/3 flex flex-col justify-between space-y-6">
+              <div>
+                <div className="flex items-center space-x-3 text-gold mb-3">
+                  <div className="p-2 bg-gold/10 rounded-lg border border-gold/20">
+                    <HelpCircle className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-heading font-extrabold text-lg sm:text-xl text-white">
+                    Catatan Pemesanan
+                  </h3>
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  Informasi teknis dan riders terkait persiapan acara. Harap dibaca dengan saksama sebelum melanjutkan pemesanan paket hiburan Anda.
+                </p>
+              </div>
 
-          <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-slate-400 text-center sm:text-left">
-              Punya kebutuhan instrumen tambahan (Orkestra, Trumpet, Harpa)? Hubungi admin langsung.
-            </p>
-            <a
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
-            >
-              <PhoneCall className="w-4 h-4 text-gold animate-bounce" />
-              <span>Tanya Admin</span>
-            </a>
+              <div className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4">
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Punya kebutuhan instrumen tambahan (Orkestra, Trumpet, Harpa)?
+                </p>
+                <a
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_ADMIN_WA || "6285147746761"}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-bold text-navy-dark bg-gradient-to-r from-gold to-yellow-500 hover:from-yellow-400 hover:to-gold transition-all shadow-lg shadow-gold/20"
+                >
+                  <PhoneCall className="w-4 h-4 animate-bounce" />
+                  <span>Hubungi Admin</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Right Column: List of Notes */}
+            <div className="lg:w-2/3 flex flex-col justify-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                {/* Item 1 */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-white">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                    <strong className="text-sm font-bold tracking-wide">Pemesanan Minimal H-14</strong>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed pl-3.5 border-l border-white/10 ml-0.5">
+                    Memudahkan musisi kami untuk menyiapkan dan berlatih lagu pilihan khusus untuk momen spesial Anda.
+                  </p>
+                </div>
+
+                {/* Item 2 */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-white">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                    <strong className="text-sm font-bold tracking-wide">Uang Muka (DP)</strong>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed pl-3.5 border-l border-white/10 ml-0.5">
+                    Pemesanan dianggap sah setelah melakukan pembayaran DP minimal 30% dari total biaya paket yang dipilih.
+                  </p>
+                </div>
+
+                {/* Item 3 */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-white">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                    <strong className="text-sm font-bold tracking-wide">Sound System</strong>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed pl-3.5 border-l border-white/10 ml-0.5">
+                    Sound system panggung standar disediakan oleh kami lengkap dengan operator suara profesional berlisensi.
+                  </p>
+                </div>
+
+                {/* Item 4 */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-white">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+                    <strong className="text-sm font-bold tracking-wide">Transportasi & Akomodasi</strong>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed pl-3.5 border-l border-white/10 ml-0.5">
+                    Biaya sudah termasuk wilayah Bandung. Di luar kota Bandung dikenakan tambahan biaya akomodasi yang wajar.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
