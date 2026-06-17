@@ -12,11 +12,13 @@ export default function PackageCard({ pkg, onShowDetails, onBook }) {
         pkg.isPopular ? "border-white/10" : ""
       )}
     >
-      {/* Elegant Popular Highlight Badge */}
+      {/* Elegant Popular Highlight Badge (Slanted Ribbon) */}
       {pkg.isPopular && (
-        <div className="absolute top-0 right-0 bg-gradient-to-r from-gold-warm/80 to-gold/60 backdrop-blur-sm text-white px-5 py-1.5 rounded-bl-xl font-medium text-[10px] uppercase tracking-[0.2em] shadow-sm z-20 flex items-center space-x-1.5">
-          <Sparkles className="w-3 h-3" />
-          <span>Rekomendasi</span>
+        <div className="absolute top-12 -right-[5.25rem] w-72 rotate-45 z-30 pointer-events-none">
+          <div className="w-full flex items-center justify-center space-x-1.5 py-1.5 shadow-lg text-[7px] font-black uppercase tracking-wider bg-gradient-to-r from-gold to-yellow-600 text-navy-dark shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+            <Sparkles className="w-2.5 h-2.5" />
+            <span>Rekomendasi</span>
+          </div>
         </div>
       )}
 
